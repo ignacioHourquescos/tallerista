@@ -24,5 +24,30 @@
     "vehicleBrand": "Volkswagen",
     "vehicleModel": "Amarok",
     "vehicleYear": "desde 2015"
+  },
+  {
+    "id": 3,
+    "vehicleName": "Amarok 2.0 CON sensor",
+    "description": "Amarok Clasica",
+    "imageUrl": "https://infoplan.com.ar/wp-content/uploads/2024/07/Amarok-2025.webp",
+    "oilFilterCode": "CH10759",
+    "airFilterCode": "CA10696",
+    "fuelFilterCode": "PS12053",
+    "cabinFilterCode": "CF9881",
+    "vehicleBrand": "Volkswagen",
+    "vehicleModel": "Amarok",
+    "vehicleYear": "desde 2015"
+  },  {
+    "id": 4,
+    "vehicleName": "Amarok 2.0 CON sensor",
+    "description": "Amarok Clasica",
+    "imageUrl": "https://infoplan.com.ar/wp-content/uploads/2024/07/Amarok-2025.webp",
+    "oilFilterCode": "CH10759",
+    "airFilterCode": "CA10696",
+    "fuelFilterCode": "PS12053",
+    "cabinFilterCode": "CF9881",
+    "vehicleBrand": "Volkswagen",
+    "vehicleModel": "Amarok",
+    "vehicleYear": "desde 2015"
   }
 ]

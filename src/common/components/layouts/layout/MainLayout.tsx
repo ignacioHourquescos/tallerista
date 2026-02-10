@@ -30,18 +30,15 @@ interface CartPanelProps {
 }
 
 const CartPanel = styled.div<CartPanelProps>`
-  position: fixed;
-  top: 64px;
-  right: 0;
-  width: ${props => props.$isMobile ? '300px' : '400px'};
-  height: calc(100vh - 64px);
-  border-left: 1px solid black;
-  transform: ${props => props.$isVisible ? 'translateX(0)' : 'translateX(100%)'};
-  transition: transform 0.3s ease-in-out;
-  z-index: 1000;
-  overflow-y: auto;
+  width: ${props => props.$isVisible ? (props.$isMobile ? '300px' : '400px') : '0px'};
+  height: 100%;
+  border-left: ${props => props.$isVisible ? '1px solid black' : 'none'};
+  transition: width 0.3s ease-in-out;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
+  background-color: white;
+  flex-shrink: 0;
 `;
 
 const MainLayout: React.FC<IMainLayout> = ({
@@ -65,27 +62,30 @@ const MainLayout: React.FC<IMainLayout> = ({
           <meta name="robots" content="" />
         </Head>
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
-          <Header />
-          <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden', position: 'relative' }}>
-            <Main
-              sx={{
-                flex: 1,
-                transition: 'width 0.3s ease-in-out',
-                width: cartIsVisible ? 'calc(100% - 400px)' : '100%',
-              }}
-            >
-              <Layout style={{ minHeight: 'calc(100vh - 64px)' }}>
-                <Layout>
-                  {type === 'home' ? (
-                    <>{children}</>
-                  ) : (
-                    <Content.Inner>
-                      <Content.Container>{children}</Content.Container>
-                    </Content.Inner>
-                  )}
+          <Box sx={{ display: 'flex', width: '100%', height: '100%' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+              <Header cartIsVisible={cartIsVisible} />
+              <Main
+                sx={{
+                  flex: 1,
+                  transition: 'flex 0.3s ease-in-out',
+                  minWidth: 0,
+                  overflow: 'auto',
+                }}
+              >
+                <Layout style={{ minHeight: 'calc(100vh - 500px)' }}>
+                  <Layout>
+                    {type === 'home' ? (
+                      <>{children}</>
+                    ) : (
+                      <Content.Inner>
+                        <Content.Container>{children}</Content.Container>
+                      </Content.Inner>
+                    )}
+                  </Layout>
                 </Layout>
-              </Layout>
-            </Main>
+              </Main>
+            </Box>
             <CartPanel $isVisible={cartIsVisible}>
               <Cart />
             </CartPanel>
@@ -106,23 +106,26 @@ const MainLayout: React.FC<IMainLayout> = ({
         <meta name="robots" content="" />
       </Head>
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
-        <Header />
-        <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden', position: 'relative' }}>
-          <Main
-            sx={{
-              flex: 1,
-              transition: 'width 0.3s ease-in-out',
-              width: cartIsVisible ? 'calc(100% - 300px)' : '100%',
-              position: 'relative',
-              paddingTop: '64px',
-            }}
-          >
-            <Layout>
-              <Content.Inner>
-                <Content.Container>{children}</Content.Container>
-              </Content.Inner>
-            </Layout>
-          </Main>
+        <Box sx={{ display: 'flex', width: '100%', height: '100%' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 }}>
+            <Header cartIsVisible={cartIsVisible} />
+            <Main
+              sx={{
+                flex: 1,
+                transition: 'flex 0.3s ease-in-out',
+                minWidth: 0,
+                overflow: 'auto',
+                position: 'relative',
+                paddingTop: '500px',
+              }}
+            >
+              <Layout>
+                <Content.Inner>
+                  <Content.Container>{children}</Content.Container>
+                </Content.Inner>
+              </Layout>
+            </Main>
+          </Box>
           <CartPanel $isVisible={cartIsVisible} $isMobile={true}>
             <Cart />
           </CartPanel>

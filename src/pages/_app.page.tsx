@@ -1,27 +1,21 @@
 import '@/styles/globals.css';
 import React from 'react';
 import type { AppProps } from 'next/app';
-import { NextPageWithLayout } from '../common/types/page';
 import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
 import { ClientProvider } from '@/context/ClientContext';
 import { FilterProvider } from '@/context/FilterContext';
-import Hotjar from '@/components/Hotjar';
+import { ViewProvider } from '@/context/ViewContext';
 
-interface AppPropsWithLayout extends AppProps {
-  Component: NextPageWithLayout;
-}
-
-function App({ Component, pageProps }: AppPropsWithLayout) {
-  const getLayout = Component.getLayout || ((page) => page);
-
+function App({ Component, pageProps }: AppProps) {
   return (
     <ClientProvider>
       <AuthProvider>
         <CartProvider>
           <FilterProvider>
-            {getLayout(<Component {...pageProps} />)}
-            <Hotjar hotjarId={process.env.NEXT_PUBLIC_HOTJAR_ID || ''} />
+            <ViewProvider>
+              <Component {...pageProps} />
+            </ViewProvider>
           </FilterProvider>
         </CartProvider>
       </AuthProvider>

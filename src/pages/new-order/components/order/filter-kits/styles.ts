@@ -2,19 +2,14 @@ import styled from 'styled-components';
 
 export const Styled = {
   Container: styled.div`
-    padding: 50px;
+    padding: 32px;
     margin: 0;
-    margin-top: 60px;
     position: relative;
     z-index: 1;
     @media (max-width: 768px) {
-      padding: 20px;
-      padding-top: 8px;
-      margin-top: 32px;
+      padding: 16px;
       width: 100%;
       box-sizing: border-box;
-      position: relative;
-      z-index: 1;
     }
   `,
   KitsGrid: styled.div`
@@ -89,7 +84,7 @@ export const Styled = {
     background-color: rgba(255, 255, 255, 0.95);
     padding: 4px 8px;
     border-radius: 4px;
-    font-size: 0.75rem;
+    font-size: 0.75em;
     font-weight: 600;
     color: #000000;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -110,7 +105,7 @@ export const Styled = {
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 1.8rem;
+    font-size: 1.8em;
     font-weight: 900;
     color: #1976d2;
     padding: 4px 8px;
@@ -168,7 +163,7 @@ export const Styled = {
     gap: 4px;
   `,
   CarouselCheckboxLabel: styled.span`
-    font-size: 0.65rem;
+    font-size: 0.65em;
     font-weight: 500;
     color: #374151;
     text-transform: uppercase;
@@ -182,14 +177,14 @@ export const Styled = {
     gap: 4px;
   `,
   KitVehicleName: styled.h3`
-    font-size: 1.4rem;
+    font-size: 1.4em;
     font-weight: bold;
-    color: #1976d2;
+    color: #1a1a1a;
     margin: 0;
     line-height: 1.2;
   `,
   KitDescription: styled.p`
-    font-size: 0.8rem;
+    font-size: 0.8em;
     color: #666;
     margin: 0;
     line-height: 1.2;
@@ -206,7 +201,7 @@ export const Styled = {
   FilterItem: styled.div`
     display: flex;
     align-items: center;
-    font-size: 0.8rem;
+    font-size: 0.8em;
     gap: 8px;
     margin: 0;
     padding: 0;
@@ -214,7 +209,7 @@ export const Styled = {
 
     span {
       font-weight: 500;
-      font-size: 0.85rem;
+      font-size: 0.85em;
       text-transform: uppercase;
       color: #374151;
       letter-spacing: 0.3px;
@@ -234,22 +229,22 @@ export const Styled = {
     gap: 4px;
   `,
   TotalPrice: styled.span`
-    font-size: 1.2rem;
+    font-size: 1.2em;
     font-weight: bold;
-    color: #1976d2;
+    color: #1a1a1a;
     text-align: right;
     line-height: 1.2;
   `,
   OriginalPrice: styled.span`
-    font-size: 1.2rem;
+    font-size: 1.2em;
     font-weight: bold;
-    color: #1976d2;
+    color: #1a1a1a;
     text-align: right;
     line-height: 1.2;
     text-decoration: line-through;
   `,
   FinalPrice: styled.span`
-    font-size: 1.2rem;
+    font-size: 1.2em;
     font-weight: bold;
     color: #FFA500;
     text-align: right;
@@ -282,7 +277,7 @@ export const Styled = {
     width: 100%;
   `,
   DiscountMessage: styled.div`
-    font-size: 0.9rem;
+    font-size: 0.9em;
     color: #FFA500;
     font-weight: 600;
     text-align: center;
@@ -312,18 +307,18 @@ export const Styled = {
     gap: 4px;
     flex: 1;
     padding: 12px 18px;
-    background-color: #1976d2;
+    background-color: #1a1a1a;
     color: white;
     border: none;
     border-radius: 4px;
-    font-size: 1rem;
+    font-size: 1em;
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.2s;
     line-height: 1.4;
 
     &:hover:not(:disabled) {
-      background-color: #1565c0;
+      background-color: #000000;
     }
 
     &:disabled {
