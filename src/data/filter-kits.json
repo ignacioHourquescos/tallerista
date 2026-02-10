@@ -1,0 +1,28 @@
+[
+  {
+    "id": 1,
+    "vehicleName": "Amarok 2.0 sin sensor",
+    "description": "Amarok Nueva",
+    "imageUrl": "https://www.carsmagazine.com.ar/wp-content/uploads/2020/02/Nueva-Volkswagen-Amarok-V6-258-Black-Style-2.jpg",
+    "oilFilterCode": "CH10759",
+    "airFilterCode": "CA10696",
+    "fuelFilterCode": "PS10695",
+    "cabinFilterCode": "CF9881",
+    "vehicleBrand": "Volkswagen",
+    "vehicleModel": "Amarok",
+    "vehicleYear": "hasta 2015"
+  },
+  {
+    "id": 2,
+    "vehicleName": "Amarok 2.0 CON sensor",
+    "description": "Amarok Clasica",
+    "imageUrl": "https://infoplan.com.ar/wp-content/uploads/2024/07/Amarok-2025.webp",
+    "oilFilterCode": "CH10759",
+    "airFilterCode": "CA10696",
+    "fuelFilterCode": "PS12053",
+    "cabinFilterCode": "CF9881",
+    "vehicleBrand": "Volkswagen",
+    "vehicleModel": "Amarok",
+    "vehicleYear": "desde 2015"
+  }
+]

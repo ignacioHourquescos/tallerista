@@ -1,0 +1,32 @@
+[
+  {
+    "code": "CH10759",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/006/347/913/products/d_nq_np_925926-mla50495578704_062022-f-c5514ba33bd094f3c217582942337024-1024-1024.webp",
+    "description": "Filtro de aceite",
+    "type": "oil"
+  },
+  {
+    "code": "CA10696",
+    "imageUrl": "https://http2.mlstatic.com/D_NQ_NP_2X_904872-MLA50498168586_062022-F.webp",
+    "description": "Filtro de aire",
+    "type": "air"
+  },
+  {
+    "code": "PS12053",
+    "imageUrl": "https://http2.mlstatic.com/D_NQ_NP_2X_820636-MLA50495066445_062022-F.webp",
+    "description": "Filtro de combustible",
+    "type": "fuel"
+  },
+  {
+    "code": "CF9881",
+    "imageUrl": "https://cdn.autodoc.de/thumb?id=10893348&m=0&n=0&lng=es&rev=94077986",
+    "description": "Filtro de cabina",
+    "type": "cabin"
+  },
+  {
+    "code": "PS10695",
+    "imageUrl": "https://http2.mlstatic.com/D_NQ_NP_2X_706670-MLA50495125397_062022-F.webp",
+    "description": "Filtro de combustible",
+    "type": "fuel"
+  }
+]
