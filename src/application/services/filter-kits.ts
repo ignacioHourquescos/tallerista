@@ -93,8 +93,8 @@ export const enrichFilterKitWithPrices = (
   const clientDiscounts = typeof window !== 'undefined' ? getClientDiscountsArray() : [];
 
   // Función auxiliar para procesar un filtro
-  const processFilter = (article: any, filterCode: string) => {
-    if (!article) return null;
+  const processFilter = (article: any, filterCode: string): FilterInfoWithPrice | undefined => {
+    if (!article) return undefined;
 
     const brand = brands[article.agru];
     const erpOriginalName = brand?.erp_original_name;
@@ -124,7 +124,10 @@ export const enrichFilterKitWithPrices = (
     (article: any) => article.id?.toLowerCase() === kit.oilFilterCode.toLowerCase()
   );
   if (oilFilterArticle) {
-    enrichedKit.oilFilter = processFilter(oilFilterArticle, kit.oilFilterCode);
+    const oilFilter = processFilter(oilFilterArticle, kit.oilFilterCode);
+    if (oilFilter) {
+      enrichedKit.oilFilter = oilFilter;
+    }
   }
 
   // Buscar filtro de aire
@@ -132,7 +135,10 @@ export const enrichFilterKitWithPrices = (
     (article: any) => article.id?.toLowerCase() === kit.airFilterCode.toLowerCase()
   );
   if (airFilterArticle) {
-    enrichedKit.airFilter = processFilter(airFilterArticle, kit.airFilterCode);
+    const airFilter = processFilter(airFilterArticle, kit.airFilterCode);
+    if (airFilter) {
+      enrichedKit.airFilter = airFilter;
+    }
   }
 
   // Buscar filtro de combustible (opcional)
@@ -141,7 +147,10 @@ export const enrichFilterKitWithPrices = (
       (article: any) => article.id?.toLowerCase() === kit.fuelFilterCode?.toLowerCase()
     );
     if (fuelFilterArticle) {
-      enrichedKit.fuelFilter = processFilter(fuelFilterArticle, kit.fuelFilterCode);
+      const fuelFilter = processFilter(fuelFilterArticle, kit.fuelFilterCode);
+      if (fuelFilter) {
+        enrichedKit.fuelFilter = fuelFilter;
+      }
     }
   }
 
@@ -151,7 +160,10 @@ export const enrichFilterKitWithPrices = (
       (article: any) => article.id?.toLowerCase() === kit.cabinFilterCode?.toLowerCase()
     );
     if (cabinFilterArticle) {
-      enrichedKit.cabinFilter = processFilter(cabinFilterArticle, kit.cabinFilterCode);
+      const cabinFilter = processFilter(cabinFilterArticle, kit.cabinFilterCode);
+      if (cabinFilter) {
+        enrichedKit.cabinFilter = cabinFilter;
+      }
     }
   }
 
