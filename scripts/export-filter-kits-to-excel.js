@@ -6,11 +6,17 @@ const path = require('path');
 const jsonPath = path.join(__dirname, '../src/data/filter-kits.json');
 const jsonData = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
 
+// Normalizar datos: asegurar que los IDs sean strings (aunque Excel puede convertirlos a números)
+const normalizedData = jsonData.map((kit) => ({
+  ...kit,
+  id: String(kit.id || '')
+}));
+
 // Crear un nuevo libro de trabajo
 const wb = XLSX.utils.book_new();
 
 // Convertir JSON a hoja de cálculo
-const ws = XLSX.utils.json_to_sheet(jsonData);
+const ws = XLSX.utils.json_to_sheet(normalizedData);
 
 // Agregar la hoja al libro
 XLSX.utils.book_append_sheet(wb, ws, 'Filter Kits');

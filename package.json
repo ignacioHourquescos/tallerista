@@ -1,10 +1,10 @@
 {
-  "name": "bwebly-app-storefront",
-  "author": "Bwebly",
-  "description": "Renova app clientes",
+  "name": "tallerista",
+  "author": "Jimancio",
+  "description": "Tallerista app",
   "version": "0.1.0",
   "private": true,
-  "homepage": "github.com/KraizzSAS/bwebly-app-storefront.git",
+  "homepage": "github.com/Jimancio/tallerista.git",
   "engines": {
     "node": ">=18.15.x",
     "npm": ">=9.5.0"

@@ -41,7 +41,13 @@ const cleanedData = jsonData.map((row) => {
   cleaned.code = row.code || row.Code || row.Código || '';
   cleaned.imageUrl = row.imageUrl || row['Image URL'] || row['URL de Imagen'] || row.imageurl || '';
   cleaned.description = row.description || row.Description || row.Descripción || '';
-  cleaned.type = row.type || row.Type || row.Tipo || '';
+  
+  // Validar que type sea uno de los valores permitidos
+  const typeValue = (row.type || row.Type || row.Tipo || '').toLowerCase();
+  const validTypes = ['oil', 'air', 'fuel', 'cabin'];
+  if (validTypes.includes(typeValue)) {
+    cleaned.type = typeValue;
+  }
   
   // Eliminar campos vacíos opcionales para mantener el JSON limpio
   if (!cleaned.imageUrl) delete cleaned.imageUrl;

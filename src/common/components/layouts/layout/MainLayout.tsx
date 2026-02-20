@@ -4,7 +4,7 @@ import { Content } from './styles';
 import { Layout } from 'antd';
 import { isMobile } from 'react-device-detect';
 import Header from '../header/Header';
-import Cart from '../../cart/Cart';
+import OrderPanel from '@/common/components/layout/OrderPanel';
 import { CartContext } from '@/context/CartContext';
 import styled from 'styled-components';
 
@@ -87,7 +87,7 @@ const MainLayout: React.FC<IMainLayout> = ({
               </Main>
             </Box>
             <CartPanel $isVisible={cartIsVisible}>
-              <Cart />
+              <OrderPanel />
             </CartPanel>
           </Box>
         </Box>
@@ -127,7 +127,7 @@ const MainLayout: React.FC<IMainLayout> = ({
             </Main>
           </Box>
           <CartPanel $isVisible={cartIsVisible} $isMobile={true}>
-            <Cart />
+            <OrderPanel />
           </CartPanel>
         </Box>
       </Box>

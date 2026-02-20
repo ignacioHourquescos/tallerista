@@ -13,9 +13,10 @@ export const getAllFilters = (): Filter[] => {
  */
 export const getFilterByCode = (code: string): Filter | undefined => {
   if (!code) return undefined;
-  return filtersData.find(
-    (f: Filter) => f.code?.toLowerCase() === code.toLowerCase()
-  ) as Filter | undefined;
+  const filter = filtersData.find(
+    (f) => f.code?.toLowerCase() === code.toLowerCase()
+  );
+  return filter as Filter | undefined;
 };
 
 /**
@@ -30,6 +31,6 @@ export const getFilterImageUrl = (code: string): string | undefined => {
  * Obtiene todos los filtros de un tipo específico
  */
 export const getFiltersByType = (type: 'oil' | 'air' | 'fuel' | 'cabin'): Filter[] => {
-  return filtersData.filter((f: Filter) => f.type === type) as Filter[];
+  return filtersData.filter((f) => f.type === type) as Filter[];
 };
 

@@ -21,11 +21,17 @@ if (!fs.existsSync(filtersPath)) {
 const filterKitsData = JSON.parse(fs.readFileSync(filterKitsPath, 'utf8'));
 const filtersData = JSON.parse(fs.readFileSync(filtersPath, 'utf8'));
 
+// Normalizar datos: asegurar que los IDs sean strings (aunque Excel puede convertirlos a números)
+const normalizedFilterKits = filterKitsData.map((kit) => ({
+  ...kit,
+  id: String(kit.id || '')
+}));
+
 // Crear un nuevo libro de trabajo
 const wb = XLSX.utils.book_new();
 
 // Convertir JSON a hojas de cálculo
-const filterKitsWs = XLSX.utils.json_to_sheet(filterKitsData);
+const filterKitsWs = XLSX.utils.json_to_sheet(normalizedFilterKits);
 const filtersWs = XLSX.utils.json_to_sheet(filtersData);
 
 // Agregar ambas hojas al libro

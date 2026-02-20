@@ -99,7 +99,13 @@ const cleanedFilters = filtersJsonData.map((row) => {
   cleaned.code = row.code || row.Code || row.Código || '';
   cleaned.imageUrl = row.imageUrl || row['Image URL'] || row['URL de Imagen'] || row.imageurl || '';
   cleaned.description = row.description || row.Description || row.Descripción || '';
-  cleaned.type = row.type || row.Type || row.Tipo || '';
+  
+  // Validar que type sea uno de los valores permitidos
+  const typeValue = (row.type || row.Type || row.Tipo || '').toLowerCase();
+  const validTypes = ['oil', 'air', 'fuel', 'cabin'];
+  if (validTypes.includes(typeValue)) {
+    cleaned.type = typeValue;
+  }
   
   if (!cleaned.imageUrl) delete cleaned.imageUrl;
   if (!cleaned.description) delete cleaned.description;
