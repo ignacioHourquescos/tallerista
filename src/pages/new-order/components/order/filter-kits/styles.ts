@@ -2,12 +2,12 @@ import styled from 'styled-components';
 
 export const Styled = {
   Container: styled.div`
-    padding: 32px;
+    padding: 32px 160px;
     margin: 0;
     position: relative;
     z-index: 1;
     @media (max-width: 768px) {
-      padding: 16px;
+      padding: 16px 80px;
       width: 100%;
       box-sizing: border-box;
     }
@@ -104,7 +104,7 @@ export const Styled = {
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 1.8em;
+    font-size: 1.4em;
     font-weight: 900;
     color: #1976d2;
     padding: 4px 8px;

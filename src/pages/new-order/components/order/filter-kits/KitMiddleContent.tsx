@@ -65,7 +65,7 @@ const CarouselButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1.8em;
+  font-size: 1.4em;
   font-weight: 900;
   color: #1976d2;
   padding: 4px 8px;

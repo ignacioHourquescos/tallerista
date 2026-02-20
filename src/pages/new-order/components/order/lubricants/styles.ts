@@ -3,12 +3,12 @@ import { Styled as ProductCardStyled } from '@/common/components/ProductCard';
 
 export const Styled = {
   Container: styled.div`
-    padding: 32px;
+    padding: 32px 160px;
     margin: 0;
     position: relative;
     z-index: 1;
     @media (max-width: 768px) {
-      padding: 16px;
+      padding: 16px 80px;
       width: 100%;
       box-sizing: border-box;
     }

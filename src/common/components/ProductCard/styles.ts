@@ -29,7 +29,7 @@ export const Styled = {
     gap: 4px;
   `,
   Title: styled.h3`
-    font-size: 1.4em;
+    font-size: 1.2em;
     font-weight: bold;
     color: #1a1a1a;
     margin: 0;
