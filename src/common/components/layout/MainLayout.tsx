@@ -1,6 +1,8 @@
 import React, { useContext, useState, useCallback } from 'react';
 import Head from 'next/head';
 import styled, { css } from 'styled-components';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { CartContext } from '@/context/CartContext';
 import { useView, ViewMode } from '@/context/ViewContext';
 import OrderPanel from './OrderPanel';
@@ -27,7 +29,7 @@ const Header = styled.header`
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  height: 48px;
+  height: 64px;
   background-color: #f5f5f5;
   box-sizing: border-box;
   flex: 1;
@@ -41,81 +43,59 @@ const HeaderLeft = styled.div`
 
 const HeaderCenter = styled.div`
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+  gap: 8px;
+  height: 100%;
+  padding-bottom: 0;
+  padding-top: 1rem;
 `;
 
-const SegmentedControl = styled.div`
-  display: flex;
-  background-color: #e0e0e0;
-  border-radius: 8px;
-  padding: 3px;
-  gap: 2px;
-`;
-
-const SegmentButton = styled.button<{ $active: boolean }>`
-  padding: 6px 20px;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.8rem;
+const BrandTitle = styled.h1`
+  margin: 0;
+  font-size: 0.95rem;
   font-weight: 600;
+  padding-top:1rem;
+  letter-spacing: 0.3em;
+  color: #1a1a1a;
+  text-transform: uppercase;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  line-height: 1.2;
+`;
+
+const TabsContainer = styled.div`
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid #e0e0e0;
+  position: relative;
+`;
+
+const TabButton = styled.button<{ $active: boolean }>`
+  padding: 10px 24px;
+  border: none;
+  background: none;
+  font-size: 0.85rem;
+  font-weight: ${(p) => (p.$active ? '600' : '500')};
   cursor: pointer;
   transition: all 0.2s ease;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap;
+  color: ${(p) => (p.$active ? '#1a1a1a' : '#666')};
+  position: relative;
+  border-bottom: 3px solid ${(p) => (p.$active ? '#1a1a1a' : 'transparent')};
+  margin-bottom: -2px;
+  z-index: 2;
 
-  ${(p) =>
-    p.$active
-      ? css`
-          background-color: #1a1a1a;
-          color: #fff;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-        `
-      : css`
-          background-color: transparent;
-          color: #555;
-
-          &:hover {
-            background-color: rgba(0, 0, 0, 0.06);
-            color: #1a1a1a;
-          }
-        `}
+  &:hover {
+    color: #1a1a1a;
+  }
 `;
 
 const HeaderRight = styled.div`
   display: flex;
   align-items: center;
-`;
-
-interface SideTitleProps {
-  $open: boolean;
-  $side: 'left' | 'right';
-}
-
-const SideTitle = styled.div<SideTitleProps>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 48px;
-  width: ${(p) => (p.$open ? '350px' : '0')};
-  overflow: hidden;
-  flex-shrink: 0;
-  border-left: ${(p) => (p.$side === 'right' && p.$open ? '1px solid #e0e0e0' : 'none')};
-  border-right: ${(p) => (p.$side === 'left' && p.$open ? '1px solid #e0e0e0' : 'none')};
-  background-color: #fff;
-  box-sizing: border-box;
-  transition: width 0.3s ease-in-out;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #333;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  white-space: nowrap;
-
-  @media (max-width: 768px) {
-    width: ${(p) => (p.$open ? '280px' : '0')};
-  }
 `;
 
 const ToggleButton = styled.button<{ $active: boolean }>`
@@ -127,8 +107,11 @@ const ToggleButton = styled.button<{ $active: boolean }>`
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: ${(p) => (p.$active ? '#1a1a1a' : '#333')};
-  padding: 8px 0;
+  padding: 8px 12px;
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
   &::after {
     content: '';
@@ -146,10 +129,31 @@ const ToggleButton = styled.button<{ $active: boolean }>`
   }
 `;
 
+const IconWrapper = styled.span`
+  display: flex;
+  align-items: center;
+  font-size: 1.2em;
+`;
+
 const Body = styled.div`
   display: flex;
   flex: 1;
   overflow: hidden;
+  position: relative;
+`;
+
+const Overlay = styled.div<{ $visible: boolean }>`
+  position: fixed;
+  top: 64px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: ${(p) => (p.$visible ? 1 : 0)};
+  visibility: ${(p) => (p.$visible ? 'visible' : 'hidden')};
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+  pointer-events: ${(p) => (p.$visible ? 'auto' : 'none')};
 `;
 
 interface SidePanelProps {
@@ -158,15 +162,27 @@ interface SidePanelProps {
 }
 
 const SidePanel = styled.aside<SidePanelProps>`
+  position: fixed;
+  top: 64px;
+  ${(p) => (p.$side === 'left' ? 'left: 0' : 'right: 0')};
   width: ${(p) => (p.$open ? '350px' : '0')};
+  height: calc(100vh - 64px);
   flex-shrink: 0;
   border-left: ${(p) => (p.$side === 'right' && p.$open ? '1px solid #e0e0e0' : 'none')};
   border-right: ${(p) => (p.$side === 'left' && p.$open ? '1px solid #e0e0e0' : 'none')};
   overflow: hidden;
-  transition: width 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out, width 0.3s ease-in-out;
   background-color: #fff;
   display: flex;
   flex-direction: column;
+  z-index: 1000;
+  box-shadow: ${(p) => (p.$open && p.$side === 'left' ? '2px 0 8px rgba(0, 0, 0, 0.15)' : p.$open && p.$side === 'right' ? '-2px 0 8px rgba(0, 0, 0, 0.15)' : 'none')};
+  transform: ${(p) => {
+    if (!p.$open) {
+      return p.$side === 'left' ? 'translateX(-100%)' : 'translateX(100%)';
+    }
+    return 'translateX(0)';
+  }};
 
   @media (max-width: 768px) {
     width: ${(p) => (p.$open ? '280px' : '0')};
@@ -181,9 +197,10 @@ const MainContent = styled.main<MainContentProps>`
   flex: 1;
   min-width: 0;
   overflow-y: auto;
-  font-size: ${(p) => (p.$panelOpen ? '0.85em' : '1em')};
-  transition: font-size 0.3s ease-in-out;
   background-color: #fafafa;
+  width: 100%;
+  position: relative;
+  z-index: 1;
 `;
 
 /* ── component ── */
@@ -234,34 +251,37 @@ const MainLayout: React.FC<IMainLayout> = ({ children, title = 'Renova - Cotizad
       <PageWrapper>
         {/* Fila superior */}
         <TopRow>
-          <SideTitle $open={filtersOpen} $side="left">
-            Filtros de búsqueda
-          </SideTitle>
-
           <Header>
             <HeaderLeft>
               <ToggleButton $active={filtersOpen} onClick={handleToggleFilters}>
+                <IconWrapper>
+                  <FilterListIcon fontSize="small" />
+                </IconWrapper>
                 {filtersOpen ? 'Filtros abiertos' : 'Filtros de búsqueda'}
               </ToggleButton>
             </HeaderLeft>
             <HeaderCenter>
-              <SegmentedControl>
-                <SegmentButton
+              <BrandTitle>Tallerista</BrandTitle>
+              <TabsContainer>
+                <TabButton
                   $active={activeView === 'kits'}
                   onClick={() => setActiveView('kits')}
                 >
                   Kits
-                </SegmentButton>
-                <SegmentButton
+                </TabButton>
+                <TabButton
                   $active={activeView === 'lubricantes'}
                   onClick={() => setActiveView('lubricantes')}
                 >
                   Lubricantes
-                </SegmentButton>
-              </SegmentedControl>
+                </TabButton>
+              </TabsContainer>
             </HeaderCenter>
             <HeaderRight>
               <ToggleButton $active={cartIsVisible} onClick={handleToggleOrder}>
+                <IconWrapper>
+                  <ShoppingCartIcon fontSize="small" />
+                </IconWrapper>
                 {cartIsVisible ? 'Pedido abierto' : 'Mi pedido'}
                 {totalItems > 0 && (
                   <>
@@ -272,14 +292,18 @@ const MainLayout: React.FC<IMainLayout> = ({ children, title = 'Renova - Cotizad
               </ToggleButton>
             </HeaderRight>
           </Header>
-
-          <SideTitle $open={cartIsVisible} $side="right">
-            Detalle del pedido
-          </SideTitle>
         </TopRow>
 
         {/* Fila inferior */}
         <Body>
+          <Overlay 
+            $visible={filtersOpen || cartIsVisible}
+            onClick={() => {
+              if (filtersOpen) setFiltersOpen(false);
+              if (cartIsVisible) setCartIsVisible(false);
+            }}
+          />
+          
           <SidePanel $open={filtersOpen} $side="left">
             <FiltersPanel />
           </SidePanel>
