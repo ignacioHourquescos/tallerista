@@ -43,8 +43,10 @@ if (jsonData.length > 0) {
 const cleanedData = jsonData.map((row) => {
   const cleaned = {};
   
-  // Mapear campos conocidos
-  cleaned.id = row.id || row.ID || '';
+  // Convertir id a string (TypeScript espera string, no number)
+  const idValue = row.id || row.ID || '';
+  cleaned.id = String(idValue);
+  
   cleaned.vehicleName = row.vehicleName || row['Vehicle Name'] || row['Nombre del Vehículo'] || '';
   cleaned.description = row.description || row.Description || row.Descripción || '';
   cleaned.imageUrl = row.imageUrl || row['Image URL'] || row['URL de Imagen'] || '/placeholder.jpg';
