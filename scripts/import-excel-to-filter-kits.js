@@ -2,21 +2,32 @@ const XLSX = require('xlsx');
 const fs = require('fs');
 const path = require('path');
 
-// Ruta del archivo Excel (por defecto en la raíz del proyecto)
-const excelPath = path.join(__dirname, '../filter-kits.xlsx');
+// Ruta del archivo Excel (ahora puede ser el archivo único o el individual)
+const excelPath = path.join(__dirname, '../data.xlsx');
+const fallbackPath = path.join(__dirname, '../filter-kits.xlsx');
 
 // Verificar que el archivo existe
+let filePath = excelPath;
 if (!fs.existsSync(excelPath)) {
-  console.error(`❌ Error: No se encontró el archivo ${excelPath}`);
-  console.log('💡 Asegúrate de que el archivo filter-kits.xlsx existe en la raíz del proyecto');
-  process.exit(1);
+  if (fs.existsSync(fallbackPath)) {
+    filePath = fallbackPath;
+    console.log('⚠️  Usando archivo individual filter-kits.xlsx');
+  } else {
+    console.error(`❌ Error: No se encontró el archivo ${excelPath} ni ${fallbackPath}`);
+    process.exit(1);
+  }
 }
 
 // Leer el archivo Excel
-const wb = XLSX.readFile(excelPath);
+const wb = XLSX.readFile(filePath);
 
-// Obtener la primera hoja
-const sheetName = wb.SheetNames[0];
+// Buscar la hoja "Filter Kits" o usar la primera hoja
+let sheetName = 'Filter Kits';
+if (!wb.SheetNames.includes(sheetName)) {
+  sheetName = wb.SheetNames[0];
+  console.log(`⚠️  Hoja "Filter Kits" no encontrada, usando: ${sheetName}`);
+}
+
 const ws = wb.Sheets[sheetName];
 
 // Convertir la hoja a JSON

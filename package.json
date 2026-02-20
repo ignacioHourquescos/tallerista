@@ -18,7 +18,9 @@
     "export:filter-kits": "node scripts/export-filter-kits-to-excel.js",
     "import:filter-kits": "node scripts/import-excel-to-filter-kits.js",
     "export:filters": "node scripts/export-filters-to-excel.js",
-    "import:filters": "node scripts/import-filters-from-excel.js"
+    "import:filters": "node scripts/import-filters-from-excel.js",
+    "export:all": "node scripts/export-all-to-excel.js",
+    "import:all": "node scripts/import-all-from-excel.js"
   },
   "dependencies": {
     "@ant-design/icons": "^5.1.4",

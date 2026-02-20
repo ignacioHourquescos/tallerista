@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Checkbox } from '@mui/material';
+import { Radio } from '@mui/material';
 import { Unstable_NumberInput as BaseNumberInput } from '@mui/base/Unstable_NumberInput';
 import { styled } from '@mui/system';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -11,15 +11,6 @@ import { FilterKitWithPrices } from '@/application/models/filter-kits';
 import { CartContext } from '@/context/CartContext';
 import { useFilter } from '@/context/FilterContext';
 import { getFilterImageUrl } from '@/application/services/filters';
-
-// Estilos personalizados para checkboxes más compactos
-const CompactCheckbox = styled(Checkbox)`
-  padding: 2px !important;
-  margin: 0 !important;
-  & .MuiSvgIcon-root {
-    font-size: 1rem;
-  }
-`;
 
 export interface IFilterKitsList {
   availableArticles: any[];
@@ -46,6 +37,7 @@ const FilterKitsList: React.FC<IFilterKitsList> = ({
   >({});
   const [kitQuantities, setKitQuantities] = useState<Record<string, number>>({});
   const [currentImageIndex, setCurrentImageIndex] = useState<Record<string, number>>({});
+  const [selectedKitType, setSelectedKitType] = useState<Record<string, 'basic' | 'complete' | 'full'>>({});
   const [isMounted, setIsMounted] = useState(false);
   const { addToCart } = useContext(CartContext);
 
@@ -74,6 +66,7 @@ const FilterKitsList: React.FC<IFilterKitsList> = ({
       const initialCabin: Record<string, boolean> = {};
       const initialQuantities: Record<string, number> = {};
       const initialImageIndex: Record<string, number> = {};
+      const initialSelectedKitType: Record<string, 'basic' | 'complete' | 'full'> = {};
       enrichedKits.forEach((kit) => {
         initialOil[kit.id] = true; // Aceite marcado por defecto
         initialAir[kit.id] = true; // Aire marcado por defecto
@@ -81,6 +74,7 @@ const FilterKitsList: React.FC<IFilterKitsList> = ({
         initialCabin[kit.id] = false; // Cabina NO marcado por defecto
         initialQuantities[kit.id] = 1;
         initialImageIndex[kit.id] = 0; // Siempre empezar con la imagen del vehículo (índice 0)
+        initialSelectedKitType[kit.id] = 'basic'; // Kit básico seleccionado por defecto
       });
       setIncludeOilFilterByKit(initialOil);
       setIncludeAirFilterByKit(initialAir);
@@ -88,22 +82,10 @@ const FilterKitsList: React.FC<IFilterKitsList> = ({
       setIncludeCabinFilterByKit(initialCabin);
       setKitQuantities(initialQuantities);
       setCurrentImageIndex(initialImageIndex);
+      setSelectedKitType(initialSelectedKitType);
     }
   }, [availableArticles, showIVA, brandFilter]);
 
-  // Calcular el descuento basado en la cantidad de filtros seleccionados
-  const getFilterQuantityDiscount = (
-    includeOil: boolean,
-    includeAir: boolean,
-    includeFuel: boolean,
-    includeCabin: boolean
-  ): number => {
-    const selectedCount = [includeOil, includeAir, includeFuel, includeCabin].filter(Boolean).length;
-    
-    // Solo 5% de descuento cuando se completen los 4 filtros
-    if (selectedCount === 4) return 5;
-    return 0;
-  };
 
   // Función para obtener las imágenes del kit (vehículo + filtros)
   const getKitImages = (kit: FilterKitWithPrices): Array<{ url: string; label: string; type?: 'oil' | 'air' | 'fuel' | 'cabin' }> => {
@@ -148,73 +130,87 @@ const FilterKitsList: React.FC<IFilterKitsList> = ({
   };
 
   const handleAddKitToCart = (kit: FilterKitWithPrices) => {
-    const includeOil = includeOilFilterByKit[kit.id];
-    const includeAir = includeAirFilterByKit[kit.id];
-    const includeFuel = includeFuelFilterByKit[kit.id];
-    const includeCabin = includeCabinFilterByKit[kit.id];
+    const kitType = selectedKitType[kit.id] || 'basic';
     const quantity = kitQuantities[kit.id] || 1;
 
-    // Calcular descuento por cantidad de filtros seleccionados
-    const quantityDiscount = getFilterQuantityDiscount(includeOil, includeAir, includeFuel, includeCabin);
+    // Determinar el nombre del tipo de kit
+    let kitTypeName = '';
+    if (kitType === 'basic') {
+      kitTypeName = 'Básico';
+    } else if (kitType === 'complete') {
+      kitTypeName = 'Completo';
+    } else if (kitType === 'full') {
+      kitTypeName = 'Full';
+    }
 
-    // Función auxiliar para crear el item del carrito desde un artículo
-    const createCartItem = (filterCode: string, filterInfo: any, qty: number, additionalDiscount: number = 0) => {
-      // Buscar el artículo completo en availableArticles
-      const article = availableArticles.find(
-        (art: any) => art.id?.toLowerCase() === filterCode.toLowerCase()
-      );
+    // Calcular el precio total del kit según el tipo seleccionado
+    let totalPriceWithoutVAT = 0;
+    let totalPriceWithVAT = 0;
 
-      const basePriceWithoutVAT = filterInfo?.priceWithoutVAT || article?.pr || 0;
-      const basePriceWithVAT = filterInfo?.priceWithVAT || Math.round(basePriceWithoutVAT * 1.21);
-      const existingDiscount = filterInfo?.discount || 0;
-      
-      // Aplicar el descuento por cantidad sobre el precio base
-      // Si hay un descuento individual mayor, usar ese; si no, usar el descuento por cantidad
-      const totalDiscount = existingDiscount > additionalDiscount ? existingDiscount : additionalDiscount;
-      
-      // Calcular precios netos con el descuento aplicado
-      const netPriceWithoutVAT = Math.round(basePriceWithoutVAT * (1 - totalDiscount / 100));
-      const netPriceWithVAT = Math.round(netPriceWithoutVAT * 1.21);
-
-      return {
-        id: filterCode,
-        descriptionAditional: article?.da || '',
-        description: filterInfo?.description || article?.d || `Filtro ${filterCode}`,
-        agrupation: article?.agru || '',
-        ubication: article?.UM || '',
-        priceWithoutVAT: basePriceWithoutVAT,
-        priceWithVAT: basePriceWithVAT,
-        discountPercentage: totalDiscount,
-        netPriceWithoutVAT: netPriceWithoutVAT,
-        netPriceWithVAT: netPriceWithVAT,
-        stock: filterInfo?.stock || article?.s || 0,
-        quantity: qty,
-      };
-    };
-
-    // Agregar cada filtro del kit al carrito con la cantidad especificada
-    for (let i = 0; i < quantity; i++) {
-      if (includeOil && kit.oilFilter) {
-        const oilFilterItem = createCartItem(kit.oilFilterCode, kit.oilFilter, 1, quantityDiscount);
-        addToCart(oilFilterItem);
+    // Kit Básico: Aceite + Aire
+    if (kitType === 'basic') {
+      if (kit.oilFilter) {
+        totalPriceWithoutVAT += kit.oilFilter.priceWithoutVAT || 0;
+        totalPriceWithVAT += kit.oilFilter.priceWithVAT || 0;
       }
-
-      if (includeAir && kit.airFilter) {
-        const airFilterItem = createCartItem(kit.airFilterCode, kit.airFilter, 1, quantityDiscount);
-        addToCart(airFilterItem);
-      }
-
-      if (includeFuel && kit.fuelFilter && kit.fuelFilterCode) {
-        const fuelFilterItem = createCartItem(kit.fuelFilterCode, kit.fuelFilter, 1, quantityDiscount);
-        addToCart(fuelFilterItem);
-      }
-
-      if (includeCabin && kit.cabinFilterCode) {
-        // Si hay información del filtro, usarla; si no, crear item básico con el código
-        const cabinFilterItem = createCartItem(kit.cabinFilterCode, kit.cabinFilter || null, 1, quantityDiscount);
-        addToCart(cabinFilterItem);
+      if (kit.airFilter) {
+        totalPriceWithoutVAT += kit.airFilter.priceWithoutVAT || 0;
+        totalPriceWithVAT += kit.airFilter.priceWithVAT || 0;
       }
     }
+    // Kit Completo: Aceite + Aire + Comb
+    else if (kitType === 'complete') {
+      if (kit.oilFilter) {
+        totalPriceWithoutVAT += kit.oilFilter.priceWithoutVAT || 0;
+        totalPriceWithVAT += kit.oilFilter.priceWithVAT || 0;
+      }
+      if (kit.airFilter) {
+        totalPriceWithoutVAT += kit.airFilter.priceWithoutVAT || 0;
+        totalPriceWithVAT += kit.airFilter.priceWithVAT || 0;
+      }
+      if (kit.fuelFilter) {
+        totalPriceWithoutVAT += kit.fuelFilter.priceWithoutVAT || 0;
+        totalPriceWithVAT += kit.fuelFilter.priceWithVAT || 0;
+      }
+    }
+    // Kit Full: Aceite + Aire + Comb + Cabina
+    else if (kitType === 'full') {
+      if (kit.oilFilter) {
+        totalPriceWithoutVAT += kit.oilFilter.priceWithoutVAT || 0;
+        totalPriceWithVAT += kit.oilFilter.priceWithVAT || 0;
+      }
+      if (kit.airFilter) {
+        totalPriceWithoutVAT += kit.airFilter.priceWithoutVAT || 0;
+        totalPriceWithVAT += kit.airFilter.priceWithVAT || 0;
+      }
+      if (kit.fuelFilter) {
+        totalPriceWithoutVAT += kit.fuelFilter.priceWithoutVAT || 0;
+        totalPriceWithVAT += kit.fuelFilter.priceWithVAT || 0;
+      }
+      if (kit.cabinFilter) {
+        totalPriceWithoutVAT += kit.cabinFilter.priceWithoutVAT || 0;
+        totalPriceWithVAT += kit.cabinFilter.priceWithVAT || 0;
+      }
+    }
+
+    // Crear el item del kit para el carrito
+    const kitCartItem = {
+      id: `kit-${kit.id}-${kitType}`, // ID único para el kit
+      description: `Kit ${kitTypeName}`, // Solo el tipo de kit
+      descriptionAditional: kit.vehicleName, // Nombre del vehículo
+      agrupation: '',
+      ubication: '',
+      priceWithoutVAT: totalPriceWithoutVAT,
+      priceWithVAT: totalPriceWithVAT,
+      discountPercentage: 0,
+      netPriceWithoutVAT: totalPriceWithoutVAT,
+      netPriceWithVAT: totalPriceWithVAT,
+      stock: 999, // Stock ilimitado para kits
+      quantity: quantity,
+    };
+
+    // Agregar el kit al carrito
+    addToCart(kitCartItem);
   };
 
   // No renderizar hasta que el componente esté montado (después de la hidratación)
@@ -296,45 +292,26 @@ const FilterKitsList: React.FC<IFilterKitsList> = ({
                       if (idx === 0) return null;
                       
                       const isActive = idx === currentIdx;
-                      let checked = false;
                       let label = '';
                       if (image.type === 'oil') {
-                        checked = !!includeOilFilterByKit[kit.id];
                         label = 'Aceite';
                       } else if (image.type === 'air') {
-                        checked = !!includeAirFilterByKit[kit.id];
                         label = 'Aire';
                       } else if (image.type === 'fuel') {
-                        checked = !!includeFuelFilterByKit[kit.id];
                         label = 'COMB';
                       } else if (image.type === 'cabin') {
-                        checked = !!includeCabinFilterByKit[kit.id];
                         label = 'Cabina';
                       }
                       
                       return (
                         <Styled.CarouselCheckboxWrapper key={idx} $active={isActive}>
-                          <Styled.CarouselCheckboxContainer>
-                            <CompactCheckbox
-                              size="small"
-                              checked={checked}
-                              disabled={false}
-                              onChange={(e) => {
-                                e.stopPropagation();
-                                // Cambiar imagen del carrusel
-                                setCurrentImageIndex(prev => ({ ...prev, [kit.id]: idx }));
-                                // Actualizar checkbox correspondiente
-                                if (image.type === 'oil') {
-                                  setIncludeOilFilterByKit(prev => ({ ...prev, [kit.id]: e.target.checked }));
-                                } else if (image.type === 'air') {
-                                  setIncludeAirFilterByKit(prev => ({ ...prev, [kit.id]: e.target.checked }));
-                                } else if (image.type === 'fuel') {
-                                  setIncludeFuelFilterByKit(prev => ({ ...prev, [kit.id]: e.target.checked }));
-                                } else if (image.type === 'cabin') {
-                                  setIncludeCabinFilterByKit(prev => ({ ...prev, [kit.id]: e.target.checked }));
-                                }
-                              }}
-                            />
+                          <Styled.CarouselCheckboxContainer
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCurrentImageIndex(prev => ({ ...prev, [kit.id]: idx }));
+                            }}
+                            style={{ cursor: 'pointer' }}
+                          >
                             <Styled.CarouselCheckboxLabel>{label}</Styled.CarouselCheckboxLabel>
                           </Styled.CarouselCheckboxContainer>
                         </Styled.CarouselCheckboxWrapper>
@@ -356,155 +333,134 @@ const FilterKitsList: React.FC<IFilterKitsList> = ({
                 </Styled.CarouselControls>
               )}
             <Styled.KitContent>
-
-              <Styled.QuantityAndButtonContainer>
-                <Styled.FirstRow>
-                  <Styled.QuantityContainer>
-                    <Styled.QuantityInput>
-                      <BaseNumberInput
-                        onChange={(event, value) => {
-                          setKitQuantities((prev) => ({
-                            ...prev,
-                            [kit.id]: value || 1,
-                          }));
-                        }}
-                        value={kitQuantities[kit.id] || 1}
-                        min={1}
-                        max={99}
-                        slots={{
-                          root: StyledInputRoot,
-                          input: StyledInput,
-                          incrementButton: StyledButton,
-                          decrementButton: StyledButton,
-                        }}
-                        slotProps={{
-                          incrementButton: {
-                            children: <AddIcon fontSize="small" />,
-                            className: 'increment',
-                          },
-                          decrementButton: {
-                            children: <RemoveIcon fontSize="small" />,
-                          },
-                        }}
-                      />
-                    </Styled.QuantityInput>
-                  </Styled.QuantityContainer>
-                  <Styled.PriceSection>
-                    {(() => {
-                      // Calcular precio según checkboxes marcados
-                      let subtotal = 0;
-                      
-                      const includeOil = includeOilFilterByKit[kit.id];
-                      const includeAir = includeAirFilterByKit[kit.id];
-                      const includeFuel = includeFuelFilterByKit[kit.id];
-                      const includeCabin = includeCabinFilterByKit[kit.id];
-
-                      if (includeOil && kit.oilFilter) {
-                        subtotal += showIVA
-                          ? kit.oilFilter.priceWithVAT
-                          : kit.oilFilter.priceWithoutVAT;
-                      }
-
-                      if (includeAir && kit.airFilter) {
-                        subtotal += showIVA
-                          ? kit.airFilter.priceWithVAT
-                          : kit.airFilter.priceWithoutVAT;
-                      }
-
-                      if (includeFuel && kit.fuelFilter) {
-                        subtotal += showIVA
-                          ? kit.fuelFilter.priceWithVAT
-                          : kit.fuelFilter.priceWithoutVAT;
-                      }
-
-                      if (includeCabin && kit.cabinFilter) {
-                        subtotal += showIVA
-                          ? kit.cabinFilter.priceWithVAT
-                          : kit.cabinFilter.priceWithoutVAT;
-                      }
-
-                      // Calcular descuento por cantidad de filtros
-                      const quantityDiscount = getFilterQuantityDiscount(includeOil, includeAir, includeFuel, includeCabin);
-                      const discountAmount = subtotal * (quantityDiscount / 100);
-                      const total = Math.round(subtotal - discountAmount);
-                      const hasDiscount = quantityDiscount > 0;
-
-                      // Formatear precios de manera consistente
-                      const formatPrice = (price: number) => {
-                        if (price <= 0) return 'N/A';
-                        return new Intl.NumberFormat('en-US', {
-                          style: 'currency',
-                          currency: 'USD',
-                          minimumFractionDigits: 0,
-                          maximumFractionDigits: 0,
-                        }).format(price);
-                      };
-
-                      return (
-                        <Styled.PriceContainer>
-                          {hasDiscount ? (
-                            <>
-                              <Styled.OriginalPrice>
-                                {formatPrice(subtotal)}
-                                {!showIVA && (
-                                  <sup style={{ fontSize: '0.7em', marginLeft: 2 }}>+ IVA</sup>
-                                )}
-                              </Styled.OriginalPrice>
-                              <Styled.FinalPrice>
-                                {formatPrice(total)}
-                                {!showIVA && (
-                                  <sup style={{ fontSize: '0.7em', marginLeft: 2 }}>+ IVA</sup>
-                                )}
-                              </Styled.FinalPrice>
-                            </>
-                          ) : (
-                            <Styled.TotalPrice>
-                              {formatPrice(total)}
-                              {!showIVA && (
-                                <sup style={{ fontSize: '0.7em', marginLeft: 2 }}>+ IVA</sup>
-                              )}
-                            </Styled.TotalPrice>
-                          )}
-                        </Styled.PriceContainer>
-                      );
-                    })()}
-                  </Styled.PriceSection>
-                </Styled.FirstRow>
+              {/* Primera fila: Precios de los 3 kits */}
+              <Styled.PriceSection>
                 {(() => {
-                  const includeOil = includeOilFilterByKit[kit.id];
-                  const includeAir = includeAirFilterByKit[kit.id];
-                  const includeFuel = includeFuelFilterByKit[kit.id];
-                  const includeCabin = includeCabinFilterByKit[kit.id];
-                  
-                  // Calcular subtotal y descuento para el mensaje de bonificación
-                  let subtotalForDiscount = 0;
-                  
-                  if (includeOil && kit.oilFilter) {
-                    subtotalForDiscount += showIVA
+                  // Formatear precios de manera consistente
+                  const formatPrice = (price: number) => {
+                    if (price <= 0) return 'N/A';
+                    return new Intl.NumberFormat('en-US', {
+                      style: 'currency',
+                      currency: 'USD',
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    }).format(price);
+                  };
+
+                  // Calcular precio Kit Básico (Aceite + Aire)
+                  let basicKitPrice = 0;
+                  if (kit.oilFilter) {
+                    basicKitPrice += showIVA
                       ? kit.oilFilter.priceWithVAT
                       : kit.oilFilter.priceWithoutVAT;
                   }
-                  if (includeAir && kit.airFilter) {
-                    subtotalForDiscount += showIVA
+                  if (kit.airFilter) {
+                    basicKitPrice += showIVA
                       ? kit.airFilter.priceWithVAT
                       : kit.airFilter.priceWithoutVAT;
                   }
-                  if (includeFuel && kit.fuelFilter) {
-                    subtotalForDiscount += showIVA
+
+                  // Calcular precio Kit Completo (Aceite + Aire + Comb)
+                  let completeKitPrice = basicKitPrice;
+                  if (kit.fuelFilter) {
+                    completeKitPrice += showIVA
                       ? kit.fuelFilter.priceWithVAT
                       : kit.fuelFilter.priceWithoutVAT;
                   }
-                  if (includeCabin && kit.cabinFilter) {
-                    subtotalForDiscount += showIVA
+
+                  // Calcular precio Kit Full (Aceite + Aire + Comb + Cabina) sin descuento
+                  let fullKitPrice = completeKitPrice;
+                  if (kit.cabinFilter) {
+                    fullKitPrice += showIVA
                       ? kit.cabinFilter.priceWithVAT
                       : kit.cabinFilter.priceWithoutVAT;
                   }
+
+                  const currentSelectedType = selectedKitType[kit.id] || 'basic';
+
+                  return (
+                    <Styled.PriceContainer>
+                      {/* Kit Básico */}
+                      <Styled.KitPriceRow>
+                        <Radio
+                          checked={currentSelectedType === 'basic'}
+                          onChange={() => setSelectedKitType(prev => ({ ...prev, [kit.id]: 'basic' }))}
+                          size="small"
+                          sx={{ padding: '4px' }}
+                        />
+                        <Styled.KitPriceLabel>Kit Básico:</Styled.KitPriceLabel>
+                        <Styled.KitPriceValue>
+                          {formatPrice(basicKitPrice)}
+                          {!showIVA && (
+                            <sup style={{ fontSize: '0.7em', marginLeft: 2 }}>+ IVA</sup>
+                          )}
+                        </Styled.KitPriceValue>
+                      </Styled.KitPriceRow>
+
+                      {/* Kit Completo */}
+                      <Styled.KitPriceRow>
+                        <Radio
+                          checked={currentSelectedType === 'complete'}
+                          onChange={() => setSelectedKitType(prev => ({ ...prev, [kit.id]: 'complete' }))}
+                          size="small"
+                          sx={{ padding: '4px' }}
+                        />
+                        <Styled.KitPriceLabel>Kit Completo:</Styled.KitPriceLabel>
+                        <Styled.KitPriceValue>
+                          {formatPrice(completeKitPrice)}
+                          {!showIVA && (
+                            <sup style={{ fontSize: '0.7em', marginLeft: 2 }}>+ IVA</sup>
+                          )}
+                        </Styled.KitPriceValue>
+                      </Styled.KitPriceRow>
+
+                      {/* Kit Full */}
+                      <Styled.KitPriceRow>
+                        <Radio
+                          checked={currentSelectedType === 'full'}
+                          onChange={() => setSelectedKitType(prev => ({ ...prev, [kit.id]: 'full' }))}
+                          size="small"
+                          sx={{ padding: '4px' }}
+                        />
+                        <Styled.KitPriceLabel>Kit Full:</Styled.KitPriceLabel>
+                        <Styled.KitPriceValue>
+                          {formatPrice(fullKitPrice)}
+                          {!showIVA && (
+                            <sup style={{ fontSize: '0.7em', marginLeft: 2 }}>+ IVA</sup>
+                          )}
+                        </Styled.KitPriceValue>
+                      </Styled.KitPriceRow>
+                    </Styled.PriceContainer>
+                  );
+                })()}
+              </Styled.PriceSection>
+
+              {/* Segunda fila: Contador y botón de agregar */}
+              <Styled.QuantityAndButtonContainer>
+                {(() => {
+                  const kitType = selectedKitType[kit.id] || 'basic';
                   
-                  const quantityDiscount = getFilterQuantityDiscount(includeOil, includeAir, includeFuel, includeCabin);
-                  const discountAmount = Math.round(subtotalForDiscount * (quantityDiscount / 100));
-                  const allFiltersSelected = includeOil && includeAir && includeFuel && includeCabin;
+                  // Determinar qué filtros incluir según el tipo de kit seleccionado
+                  let includeOil = false;
+                  let includeAir = false;
+                  let includeFuel = false;
+                  let includeCabin = false;
                   
-                  // Contar filtros seleccionados
+                  if (kitType === 'basic') {
+                    includeOil = true;
+                    includeAir = true;
+                  } else if (kitType === 'complete') {
+                    includeOil = true;
+                    includeAir = true;
+                    includeFuel = true;
+                  } else if (kitType === 'full') {
+                    includeOil = true;
+                    includeAir = true;
+                    includeFuel = true;
+                    includeCabin = true;
+                  }
+                  
+                  // Contar filtros disponibles según el tipo de kit seleccionado
                   const selectedCount = [
                     includeOil && kit.oilFilter && (kit.oilFilter.stock || 0) > 0,
                     includeAir && kit.airFilter && (kit.airFilter.stock || 0) > 0,
@@ -515,20 +471,45 @@ const FilterKitsList: React.FC<IFilterKitsList> = ({
                   const isDisabled = selectedCount < 2;
                   
                   return (
-                    <>
-                      {allFiltersSelected && quantityDiscount > 0 && (
-                        <Styled.DiscountMessage>
-                          Bonificación del 5% por kit completo
-                        </Styled.DiscountMessage>
-                      )}
-                      <Styled.AddButton
-                        onClick={() => handleAddKitToCart(kit)}
-                        disabled={isDisabled}
-                        title={isDisabled ? 'Seleccionar al menos 2 filtros por auto' : ''}
-                      >
-                        {isDisabled ? 'Seleccionar al menos 2 filtros' : 'Agregar'}
-                      </Styled.AddButton>
-                    </>
+                    <Styled.FirstRow>
+                        <Styled.QuantityContainer>
+                          <Styled.QuantityInput>
+                            <BaseNumberInput
+                              onChange={(event, value) => {
+                                setKitQuantities((prev) => ({
+                                  ...prev,
+                                  [kit.id]: value || 1,
+                                }));
+                              }}
+                              value={kitQuantities[kit.id] || 1}
+                              min={1}
+                              max={99}
+                              slots={{
+                                root: StyledInputRoot,
+                                input: StyledInput,
+                                incrementButton: StyledButton,
+                                decrementButton: StyledButton,
+                              }}
+                              slotProps={{
+                                incrementButton: {
+                                  children: <AddIcon fontSize="small" />,
+                                  className: 'increment',
+                                },
+                                decrementButton: {
+                                  children: <RemoveIcon fontSize="small" />,
+                                },
+                              }}
+                            />
+                          </Styled.QuantityInput>
+                        </Styled.QuantityContainer>
+                        <Styled.AddButton
+                          onClick={() => handleAddKitToCart(kit)}
+                          disabled={isDisabled}
+                          title={isDisabled ? 'Seleccionar al menos 2 filtros por auto' : ''}
+                        >
+                          {isDisabled ? 'Seleccionar al menos 2 filtros' : 'Agregar'}
+                        </Styled.AddButton>
+                      </Styled.FirstRow>
                   );
                 })()}
               </Styled.QuantityAndButtonContainer>

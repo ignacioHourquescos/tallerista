@@ -28,5 +28,53 @@
     "imageUrl": "https://http2.mlstatic.com/D_NQ_NP_2X_706670-MLA50495125397_062022-F.webp",
     "description": "Filtro de combustible",
     "type": "fuel"
+  },
+  {
+    "code": "PH5752",
+    "imageUrl": "https://catalogofram.com.ar/img?url=https%3A%2F%2Fproduction-specparts-search-api-images-bucket.s3.amazonaws.com%2Fpart_pictures%2FdtFrIQMgCbiL8YxiIszPpWuHmD3Cmegl.jpg",
+    "description": "Filtro de aceite",
+    "type": "oil"
+  },
+  {
+    "code": "WA11150",
+    "imageUrl": "https://http2.mlstatic.com/D_NQ_NP_2X_787180-MLA81822320174_012025-F.webp",
+    "description": "Filtro de aire",
+    "type": "air"
+  },
+  {
+    "code": "G7729",
+    "imageUrl": "https://http2.mlstatic.com/D_NQ_NP_2X_931909-MLA45614149537_042021-F.webp",
+    "description": "Filtro de combustible",
+    "type": "fuel"
+  },
+  {
+    "code": "HK214",
+    "imageUrl": "https://www.dhfdistribuidora.com.ar/content/bucket/1/2041w430h270.jpg.webp",
+    "description": "Filtro de cabina",
+    "type": "cabin"
+  },
+  {
+    "code": "PH4701",
+    "imageUrl": "https://catalogofram.com.ar/img?url=https%3A%2F%2Fproduction-specparts-search-api-images-bucket.s3.amazonaws.com%2Fpart_pictures%2F2liwqz8LkCYWhh9okVOo6E8PsHXpbrEq.jpg",
+    "description": "Filtro de aceite",
+    "type": "oil"
+  },
+  {
+    "code": "CA5496",
+    "imageUrl": "https://catalogofram.com.ar/img?url=https%3A%2F%2Fproduction-specparts-search-api-images-bucket.s3.amazonaws.com%2Fpart_pictures%2FOvRXIBulkwgiUGaBOQETtmseIu305iY2.jpg",
+    "description": "Filtro de aire",
+    "type": "air"
+  },
+  {
+    "code": "G5995",
+    "imageUrl": "https://catalogofram.com.ar/img?url=https%3A%2F%2Fproduction-specparts-search-api-images-bucket.s3.amazonaws.com%2Fpart_pictures%2FodkNrJ4jaRJKup4uPYeuJpZpCthCCoiM.jpg",
+    "description": "Filtro de combustible",
+    "type": "fuel"
+  },
+  {
+    "code": "HK301",
+    "imageUrl": "https://catalogofram.com.ar/img?url=https%3A%2F%2Fproduction-specparts-search-api-images-bucket.s3.amazonaws.com%2Fpart_pictures%2FU8AMrhqlgiWkp3zCk7exfo5uMQOMaTq3.jpg",
+    "description": "Filtro de cabina",
+    "type": "cabin"
   }
 ]

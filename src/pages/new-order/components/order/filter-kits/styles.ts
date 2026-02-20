@@ -217,16 +217,42 @@ export const Styled = {
   `,
   PriceSection: styled.div`
     display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    width: 50%;
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
     flex-shrink: 0;
+    margin-bottom: 8px;
   `,
   PriceContainer: styled.div`
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: flex-start;
+    gap: 8px;
+    width: 100%;
+  `,
+  KitPriceRow: styled.div`
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
+  `,
+  KitPriceLabel: styled.span`
+    font-size: 0.9em;
+    font-weight: 500;
+    color: #666;
+    flex-shrink: 0;
+    text-align: left;
+  `,
+  KitPriceValue: styled.span`
+    font-size: 1em;
+    font-weight: 600;
+    color: #1a1a1a;
+    display: flex;
+    align-items: center;
     gap: 4px;
+    margin-left: auto;
   `,
   TotalPrice: styled.span`
     font-size: 1.2em;
@@ -288,8 +314,8 @@ export const Styled = {
     align-items: center;
     justify-content: flex-start;
     gap: 2px;
-    width: 50%;
     flex-shrink: 0;
+    margin-right: 12px;
   `,
   QuantityInput: styled.div`
     display: flex;

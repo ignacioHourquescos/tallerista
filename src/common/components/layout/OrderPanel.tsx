@@ -12,6 +12,7 @@ interface GroupedKit {
   kitId: string;
   vehicleName: string;
   description: string;
+  kitType?: string; // Tipo de kit (Básico, Completo, Full)
   imageUrl: string;
   filters: {
     code: string;
@@ -75,7 +76,7 @@ const KitCard = styled.div`
 const KitHeader = styled.div`
   display: flex;
   align-items: center;
-  padding: 12px;
+  padding: 0;
   gap: 12px;
   border-bottom: 1px solid #f0f0f0;
 `;
@@ -83,9 +84,9 @@ const KitHeader = styled.div`
 const KitImage = styled.img`
   width: 64px;
   height: 48px;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 4px;
-  border: 1px solid #e0e0e0;
+ 
 `;
 
 const KitInfo = styled.div`
@@ -150,7 +151,9 @@ const FilterPrice = styled.span`
 `;
 
 const KitTotal = styled.div`
-  text-align: right;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-weight: 600;
   font-size: 0.95rem;
   color: #111;
@@ -212,52 +215,89 @@ const OrderPanel: React.FC = () => {
     const grouped: Record<string, GroupedKit> = {};
 
     cartItems.forEach((article) => {
-      const kit = kits.find(
-        (k) =>
-          k.oilFilterCode?.toLowerCase() === article.id.toLowerCase() ||
-          k.airFilterCode?.toLowerCase() === article.id.toLowerCase() ||
-          k.fuelFilterCode?.toLowerCase() === article.id.toLowerCase() ||
-          k.cabinFilterCode?.toLowerCase() === article.id.toLowerCase()
-      );
-
-      if (kit) {
-        const kitKey = kit.id.toString();
-
-        if (!grouped[kitKey]) {
-          grouped[kitKey] = {
-            kitId: kit.id.toString(),
-            vehicleName: kit.vehicleName,
-            description: kit.description,
-            imageUrl: kit.imageUrl,
-            filters: [],
-            quantity: 0,
-            totalPrice: 0,
-          };
+      // Detectar si es un item de kit (empieza con "kit-")
+      if (article.id.startsWith('kit-')) {
+        // Extraer kitId y kitType del ID (formato: kit-{kitId}-{kitType})
+        const parts = article.id.split('-');
+        if (parts.length >= 3) {
+          const kitId = parts[1];
+          const kitType = parts[2]; // El tipo de kit está en la tercera parte
+          const kit = kits.find((k) => k.id.toString() === kitId);
+          
+          if (kit) {
+            // Usar el ID completo como clave para agrupar por tipo de kit
+            const kitKey = article.id;
+            
+            if (!grouped[kitKey]) {
+              grouped[kitKey] = {
+                kitId: kitKey,
+                vehicleName: article.descriptionAditional || kit.vehicleName, // Usar descriptionAditional si está disponible
+                description: article.description || `Kit ${kit.vehicleName}`,
+                kitType: kitType,
+                imageUrl: kit.imageUrl,
+                filters: [], // Sin desglose de filtros individuales
+                quantity: article.quantity || 1,
+                totalPrice: (article.netPriceWithVAT || article.priceWithVAT || 0) * (article.quantity || 1),
+              };
+            } else {
+              grouped[kitKey].quantity += article.quantity || 1;
+              grouped[kitKey].totalPrice += (article.netPriceWithVAT || article.priceWithVAT || 0) * (article.quantity || 1);
+            }
+          }
         }
+      } else {
+        // Lógica original para filtros individuales
+        const kit = kits.find(
+          (k) =>
+            k.oilFilterCode?.toLowerCase() === article.id.toLowerCase() ||
+            k.airFilterCode?.toLowerCase() === article.id.toLowerCase() ||
+            k.fuelFilterCode?.toLowerCase() === article.id.toLowerCase() ||
+            k.cabinFilterCode?.toLowerCase() === article.id.toLowerCase()
+        );
 
-        let filterType: 'oil' | 'air' | 'fuel' | 'cabin' = 'oil';
-        if (kit.oilFilterCode?.toLowerCase() === article.id.toLowerCase()) filterType = 'oil';
-        else if (kit.airFilterCode?.toLowerCase() === article.id.toLowerCase()) filterType = 'air';
-        else if (kit.fuelFilterCode?.toLowerCase() === article.id.toLowerCase()) filterType = 'fuel';
-        else if (kit.cabinFilterCode?.toLowerCase() === article.id.toLowerCase()) filterType = 'cabin';
+        if (kit) {
+          const kitKey = kit.id.toString();
 
-        const existing = grouped[kitKey].filters.find((f) => f.type === filterType);
-        if (existing) {
-          existing.article = {
-            ...existing.article,
-            quantity: existing.article.quantity + article.quantity,
-          };
-        } else {
-          grouped[kitKey].filters.push({ code: article.id, article: { ...article }, type: filterType });
+          if (!grouped[kitKey]) {
+            grouped[kitKey] = {
+              kitId: kit.id.toString(),
+              vehicleName: kit.vehicleName,
+              description: kit.description,
+              imageUrl: kit.imageUrl,
+              filters: [],
+              quantity: 0,
+              totalPrice: 0,
+            };
+          }
+
+          let filterType: 'oil' | 'air' | 'fuel' | 'cabin' = 'oil';
+          if (kit.oilFilterCode?.toLowerCase() === article.id.toLowerCase()) filterType = 'oil';
+          else if (kit.airFilterCode?.toLowerCase() === article.id.toLowerCase()) filterType = 'air';
+          else if (kit.fuelFilterCode?.toLowerCase() === article.id.toLowerCase()) filterType = 'fuel';
+          else if (kit.cabinFilterCode?.toLowerCase() === article.id.toLowerCase()) filterType = 'cabin';
+
+          const existing = grouped[kitKey].filters.find((f) => f.type === filterType);
+          if (existing) {
+            existing.article = {
+              ...existing.article,
+              quantity: existing.article.quantity + article.quantity,
+            };
+          } else {
+            grouped[kitKey].filters.push({ code: article.id, article: { ...article }, type: filterType });
+          }
+
+          const itemTotal = (article.netPriceWithVAT || article.priceWithVAT || 0) * article.quantity;
+          grouped[kitKey].totalPrice += itemTotal;
         }
-
-        const itemTotal = (article.netPriceWithVAT || article.priceWithVAT || 0) * article.quantity;
-        grouped[kitKey].totalPrice += itemTotal;
       }
     });
 
     Object.values(grouped).forEach((kit) => {
-      if (kit.filters.length > 0) {
+      if (kit.filters.length === 0) {
+        // Si no hay filtros (es un kit completo), mantener la cantidad del artículo
+        // La cantidad ya está establecida arriba
+      } else {
+        // Para kits con filtros individuales, calcular cantidad mínima
         const quantities = kit.filters.map((f) => f.article.quantity);
         kit.quantity = Math.min(...quantities);
       }
@@ -283,17 +323,9 @@ const OrderPanel: React.FC = () => {
                 <KitHeader>
                   <KitImage src={gk.imageUrl} alt={gk.vehicleName} />
                   <KitInfo>
-                    <KitName>{gk.vehicleName}</KitName>
-                    <KitDesc>{gk.description}</KitDesc>
-                    <KitQty>Cant: {gk.quantity}</KitQty>
+                    <KitName>{gk.quantity} x {gk.description}</KitName>
+                    <KitDesc>{gk.vehicleName}</KitDesc>
                   </KitInfo>
-                  <IconButton
-                    size="small"
-                    sx={{ color: '#d32f2f' }}
-                    onClick={() => gk.filters.forEach((f) => removeFromCart(f.code))}
-                  >
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
                 </KitHeader>
 
                 {gk.filters.map((f) => (
@@ -308,7 +340,25 @@ const OrderPanel: React.FC = () => {
                   </FilterRow>
                 ))}
 
-                <KitTotal>Total: ${gk.totalPrice.toLocaleString('es-AR')}</KitTotal>
+                <KitTotal>
+                  <IconButton
+                    size="small"
+                    sx={{ color: '#d32f2f' }}
+                    onClick={() => {
+                      // Si es un kit completo (empieza con "kit-"), eliminar el item de kit
+                      if (gk.kitId.startsWith('kit-')) {
+                        // El kitId ya es el ID completo del artículo, eliminarlo directamente
+                        removeFromCart(gk.kitId);
+                      } else {
+                        // Eliminar filtros individuales
+                        gk.filters.forEach((f) => removeFromCart(f.code));
+                      }
+                    }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                  <span>${gk.totalPrice.toLocaleString('es-AR')}</span>
+                </KitTotal>
               </KitCard>
             ))}
           </Content>
