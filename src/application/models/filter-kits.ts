@@ -26,6 +26,8 @@ export interface FilterKit {
   vehicleModel?: string;
   /** Año del vehículo (opcional) */
   vehicleYear?: string;
+  /** Tipo de vehículo (opcional) - ej: "auto", "camioneta" */
+  type?: string;
 }
 
 /**

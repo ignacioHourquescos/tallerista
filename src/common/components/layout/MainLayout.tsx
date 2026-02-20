@@ -122,7 +122,7 @@ const ToggleButton = styled.button<{ $active: boolean }>`
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 1rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -199,6 +199,10 @@ const MainLayout: React.FC<IMainLayout> = ({ children, title = 'Renova - Cotizad
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPrice = cartItems.reduce((sum, item) => {
+    const itemPrice = item.netPriceWithVAT || item.priceWithVAT || 0;
+    return sum + (itemPrice * item.quantity);
+  }, 0);
 
   const handleToggleFilters = useCallback(() => {
     if (!filtersOpen) {
@@ -258,7 +262,13 @@ const MainLayout: React.FC<IMainLayout> = ({ children, title = 'Renova - Cotizad
             </HeaderCenter>
             <HeaderRight>
               <ToggleButton $active={cartIsVisible} onClick={handleToggleOrder}>
-                {cartIsVisible ? 'Pedido abierto' : 'Mi pedido'}{totalItems > 0 ? ` (${totalItems})` : ''}
+                {cartIsVisible ? 'Pedido abierto' : 'Mi pedido'}
+                {totalItems > 0 && (
+                  <>
+                    {' '}({totalItems})
+                    {totalPrice > 0 && ` - $${totalPrice.toLocaleString('es-AR')}`}
+                  </>
+                )}
               </ToggleButton>
             </HeaderRight>
           </Header>

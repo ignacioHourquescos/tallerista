@@ -60,6 +60,7 @@ const cleanedData = jsonData.map((row) => {
   cleaned.vehicleBrand = row.vehicleBrand || row['Vehicle Brand'] || row['Marca del Vehículo'] || '';
   cleaned.vehicleModel = row.vehicleModel || row['Vehicle Model'] || row['Modelo del Vehículo'] || '';
   cleaned.vehicleYear = row.vehicleYear || row['Vehicle Year'] || row['Año del Vehículo'] || '';
+  cleaned.type = row.type || row.Type || row['Tipo'] || row['Tipo de Auto'] || '';
   
   // Eliminar campos vacíos opcionales para mantener el JSON limpio
   if (!cleaned.fuelFilterCode) delete cleaned.fuelFilterCode;
@@ -67,6 +68,7 @@ const cleanedData = jsonData.map((row) => {
   if (!cleaned.vehicleBrand) delete cleaned.vehicleBrand;
   if (!cleaned.vehicleModel) delete cleaned.vehicleModel;
   if (!cleaned.vehicleYear) delete cleaned.vehicleYear;
+  if (!cleaned.type) delete cleaned.type;
   
   return cleaned;
 });

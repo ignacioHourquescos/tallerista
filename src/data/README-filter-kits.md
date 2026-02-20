@@ -12,9 +12,11 @@ Cada kit de filtros contiene:
 - **oilFilterCode**: Código del filtro de aceite (obligatorio)
 - **airFilterCode**: Código del filtro de aire (obligatorio)
 - **fuelFilterCode**: Código del filtro de combustible (opcional)
+- **cabinFilterCode**: Código del filtro de cabina (opcional)
 - **vehicleBrand**: Marca del vehículo (opcional)
 - **vehicleModel**: Modelo del vehículo (opcional)
 - **vehicleYear**: Año del vehículo (opcional)
+- **type**: Tipo de vehículo (opcional) - ej: "auto", "camioneta"
 
 ## Uso
 

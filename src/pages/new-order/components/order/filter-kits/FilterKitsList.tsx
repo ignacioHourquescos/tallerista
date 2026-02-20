@@ -1,14 +1,11 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Unstable_NumberInput as BaseNumberInput } from '@mui/base/Unstable_NumberInput';
-import { styled } from '@mui/system';
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
-import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import OilBarrelIcon from '@mui/icons-material/OilBarrel';
-import AirIcon from '@mui/icons-material/Air';
-import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import { Styled } from './styles';
+import { Styled as ProductCardStyled, StyledInputRoot, StyledInput, StyledButton } from '@/common/components/ProductCard';
+import ProductCard from '@/common/components/ProductCard';
+import KitMiddleContent from './KitMiddleContent';
 import { enrichAllFilterKitsWithPrices } from '@/application/services/filter-kits';
 import { FilterKitWithPrices } from '@/application/models/filter-kits';
 import { CartContext } from '@/context/CartContext';
@@ -228,116 +225,21 @@ const FilterKitsList: React.FC<IFilterKitsList> = ({
             const images = getKitImages(kit);
             const currentIdx = currentImageIndex[kit.id] || 0;
             
-            return (
-            <Styled.KitCard key={kit.id}>
-              <Styled.KitContent>
-                <Styled.KitVehicleName>{kit.vehicleName}</Styled.KitVehicleName>
-                <Styled.KitDescription>{kit.description}</Styled.KitDescription>
-              </Styled.KitContent>
-              <Styled.KitImageContainer>
-                {images.length <= 1 ? (
-                  // Si solo hay una imagen, mostrar sin carrusel
-                  <Styled.KitImage
-                    src={images[0]?.url || kit.imageUrl || '/placeholder.jpg'}
-                    alt={images[0]?.label || kit.vehicleName}
-                    onError={(e: any) => {
-                      e.target.src = '/placeholder.jpg';
-                    }}
-                  />
-                ) : (
-                  // Carrusel con múltiples imágenes
-                  <>
-                    <Styled.CarouselImage
-                      src={images[currentIdx]?.url || '/placeholder.jpg'}
-                      alt={images[currentIdx]?.label || kit.vehicleName}
-                      onError={(e: any) => {
-                        e.target.src = '/placeholder.jpg';
-                      }}
-                    />
-                    {currentIdx > 0 && images[currentIdx]?.type && (
-                      <Styled.FilterCodeBadge>
-                        {images[currentIdx].type === 'oil' && kit.oilFilterCode}
-                        {images[currentIdx].type === 'air' && kit.airFilterCode}
-                        {images[currentIdx].type === 'fuel' && kit.fuelFilterCode}
-                        {images[currentIdx].type === 'cabin' && kit.cabinFilterCode}
-                      </Styled.FilterCodeBadge>
-                    )}
-                  </>
-                )}
-              </Styled.KitImageContainer>
-              {images.length > 1 && (
-                <Styled.CarouselControls>
-                  <Styled.CarouselButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const newIdx = (currentIdx - 1 + images.length) % images.length;
-                      setCurrentImageIndex(prev => ({
-                        ...prev,
-                        [kit.id]: newIdx
-                      }));
-                    }}
-                  >
-                    ←
-                  </Styled.CarouselButton>
-                  <Styled.CarouselCheckboxes>
-                    {/* Selector de imagen del auto (índice 0) */}
-                    <Styled.CarouselVehicleSelector
-                      $active={currentIdx === 0}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setCurrentImageIndex(prev => ({ ...prev, [kit.id]: 0 }));
-                      }}
-                    >
-                      <DirectionsCarIcon fontSize="small" />
-                    </Styled.CarouselVehicleSelector>
-                    {images.map((image, idx) => {
-                      // Índice 0 es el auto, ya lo mostramos arriba
-                      if (idx === 0) return null;
-                      
-                      const isActive = idx === currentIdx;
-                      let IconComponent = null;
-                      if (image.type === 'oil') {
-                        IconComponent = OilBarrelIcon;
-                      } else if (image.type === 'air') {
-                        IconComponent = AirIcon;
-                      } else if (image.type === 'fuel') {
-                        IconComponent = LocalGasStationIcon;
-                      } else if (image.type === 'cabin') {
-                        IconComponent = FilterAltIcon;
-                      }
-                      
-                      if (!IconComponent) return null;
-                      
-                      return (
-                        <Styled.CarouselFilterIcon
-                          key={idx}
-                          $active={isActive}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setCurrentImageIndex(prev => ({ ...prev, [kit.id]: idx }));
-                          }}
-                        >
-                          <IconComponent fontSize="small" />
-                        </Styled.CarouselFilterIcon>
-                      );
-                    })}
-                  </Styled.CarouselCheckboxes>
-                  <Styled.CarouselButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const newIdx = (currentIdx + 1) % images.length;
-                      setCurrentImageIndex(prev => ({
-                        ...prev,
-                        [kit.id]: newIdx
-                      }));
-                    }}
-                  >
-                    →
-                  </Styled.CarouselButton>
-                </Styled.CarouselControls>
-              )}
-            <Styled.KitContent>
-              {/* Sección inferior: Precios y acciones */}
+            const middleContent = (
+              <KitMiddleContent
+                kit={kit}
+                images={images}
+                currentIndex={currentIdx}
+                onIndexChange={(newIdx) => {
+                  setCurrentImageIndex(prev => ({
+                    ...prev,
+                    [kit.id]: newIdx
+                  }));
+                }}
+              />
+            );
+            
+            const footerContent = (
               <Styled.BottomSection>
               {/* Primera fila: Precios de los 3 kits */}
               <Styled.PriceSection>
@@ -433,7 +335,7 @@ const FilterKitsList: React.FC<IFilterKitsList> = ({
               </Styled.PriceSection>
 
               {/* Segunda fila: Contador y botón de agregar */}
-              <Styled.QuantityAndButtonContainer>
+              <ProductCardStyled.QuantityAndButtonContainer>
                 {(() => {
                   const kitType = selectedKitType[kit.id] || 'complete';
                   
@@ -468,9 +370,9 @@ const FilterKitsList: React.FC<IFilterKitsList> = ({
                   const isDisabled = selectedCount < 2;
                   
                   return (
-                    <Styled.FirstRow>
-                        <Styled.QuantityContainer>
-                          <Styled.QuantityInput>
+                    <ProductCardStyled.FirstRow>
+                        <ProductCardStyled.QuantityContainer>
+                          <ProductCardStyled.QuantityInput>
                             <BaseNumberInput
                               onChange={(event, value) => {
                                 setKitQuantities((prev) => ({
@@ -497,130 +399,35 @@ const FilterKitsList: React.FC<IFilterKitsList> = ({
                                 },
                               }}
                             />
-                          </Styled.QuantityInput>
-                        </Styled.QuantityContainer>
-                        <Styled.AddButton
+                          </ProductCardStyled.QuantityInput>
+                        </ProductCardStyled.QuantityContainer>
+                        <ProductCardStyled.AddButton
                           onClick={() => handleAddKitToCart(kit)}
                           disabled={isDisabled}
                           title={isDisabled ? 'Seleccionar al menos 2 filtros por auto' : ''}
                         >
                           {isDisabled ? 'Seleccionar al menos 2 filtros' : 'Agregar'}
-                        </Styled.AddButton>
-                      </Styled.FirstRow>
+                        </ProductCardStyled.AddButton>
+                      </ProductCardStyled.FirstRow>
                   );
                 })()}
-              </Styled.QuantityAndButtonContainer>
+              </ProductCardStyled.QuantityAndButtonContainer>
               </Styled.BottomSection>
-            </Styled.KitContent>
-          </Styled.KitCard>
-          );
-        })}
+            );
+            
+            return (
+              <ProductCard
+                key={kit.id}
+                title={kit.vehicleName}
+                subtitle={kit.description}
+                middleContent={middleContent}
+                footerContent={footerContent}
+              />
+            );
+          })}
       </Styled.KitsGrid>
     </Styled.Container>
   );
 };
 
 export default FilterKitsList;
-
-// Estilos para el NumberInput (similar a QuantityInput)
-const blue = {
-  100: '#daecff',
-  200: '#b6daff',
-  300: '#66b2ff',
-  400: '#3399ff',
-  500: '#007fff',
-  600: '#0072e5',
-  700: '#0059B2',
-  800: '#004c99',
-};
-
-const grey = {
-  50: '#F3F6F9',
-  100: '#E5EAF2',
-  200: '#DAE2ED',
-  300: '#C7D0DD',
-  400: '#B0B8C4',
-  500: '#9DA8B7',
-  600: '#6B7A90',
-  700: '#434D5B',
-  800: '#303740',
-  900: '#1C2025',
-};
-
-const StyledInputRoot = styled('div')`
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-weight: 400;
-  color: ${grey[500]};
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: center;
-  align-items: center;
-`;
-
-const StyledInput = styled('input')`
-  font-size: 0.875rem;
-  font-family: inherit;
-  font-weight: 400;
-  line-height: 1.375;
-  color: #1a1a1a;
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
-  box-shadow: none;
-  border-radius: 8px;
-  margin: 0 2px;
-  padding: 6px 8px;
-  outline: 0;
-  min-width: 0;
-  width: 3rem;
-  text-align: center;
-
-  &:hover {
-    border-color: ${blue[400]};
-  }
-
-  &:focus {
-    border-color: ${blue[400]};
-    box-shadow: 0 0 0 3px ${blue[200]};
-  }
-
-  &:focus-visible {
-    outline: 0;
-  }
-`;
-
-const StyledButton = styled('button')`
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 0.875rem;
-  box-sizing: border-box;
-  line-height: 1.5;
-  border: 1px solid;
-  border-radius: 999px;
-  border-color: #e0e0e0;
-  background:rgb(255, 255, 255);
-  color:rgb(14, 14, 14);
-  width: 25px;
-  height: 25px;
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: center;
-  align-items: center;
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 120ms;
-
-  &:hover {
-    cursor: pointer;
-    background: #fff5e6;
-    border-color: #FF8C00;
-    color: #FF8C00;
-  }
-
-  &:focus-visible {
-    outline: 0;
-  }
-
-  &.increment {
-    order: 1;
-  }
-`;
-

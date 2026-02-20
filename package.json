@@ -19,6 +19,8 @@
     "import:filter-kits": "node scripts/import-excel-to-filter-kits.js",
     "export:filters": "node scripts/export-filters-to-excel.js",
     "import:filters": "node scripts/import-filters-from-excel.js",
+    "export:lubricants": "node scripts/export-lubricants-to-excel.js",
+    "import:lubricants": "node scripts/import-excel-to-lubricants.js",
     "export:all": "node scripts/export-all-to-excel.js",
     "import:all": "node scripts/import-all-from-excel.js"
   },

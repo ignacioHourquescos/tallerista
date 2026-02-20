@@ -21,7 +21,10 @@ const Order: React.FC<IOrder> = ({ availableArticles }) => {
             showIVA={showIVA}
           />
         ) : (
-          <LubricantsList />
+          <LubricantsList
+            availableArticles={availableArticles}
+            showIVA={showIVA}
+          />
         )}
       </Styled.SearchControl>
     </Styled.Inner>

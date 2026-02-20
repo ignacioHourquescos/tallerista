@@ -1,0 +1,16 @@
+[
+  {
+    "id": "1",
+    "code": "04VA153",
+    "description": "Advenced oil",
+    "graduation": "5W40",
+    "type": "mineral",
+    "norm": "API SN",
+    "imageUrl": "https://files.paganoycia.com.ar/articles/04VA153.jpg",
+    "presentation": {
+      "unit": "0%",
+      "box": "10%",
+      "promo": "15%"
+    }
+  }
+]

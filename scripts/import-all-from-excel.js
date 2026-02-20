@@ -6,6 +6,7 @@ const path = require('path');
 const excelPath = path.join(__dirname, '../data.xlsx');
 const filterKitsFallback = path.join(__dirname, '../filter-kits.xlsx');
 const filtersFallback = path.join(__dirname, '../filters.xlsx');
+const lubricantsFallback = path.join(__dirname, '../lubricants.xlsx');
 
 console.log('🔄 Importando desde Excel...\n');
 
@@ -52,12 +53,14 @@ const cleanedFilterKits = filterKitsJsonData.map((row) => {
   cleaned.vehicleBrand = row.vehicleBrand || row['Vehicle Brand'] || row['Marca del Vehículo'] || '';
   cleaned.vehicleModel = row.vehicleModel || row['Vehicle Model'] || row['Modelo del Vehículo'] || '';
   cleaned.vehicleYear = row.vehicleYear || row['Vehicle Year'] || row['Año del Vehículo'] || '';
+  cleaned.type = row.type || row.Type || row['Tipo'] || row['Tipo de Auto'] || '';
   
   if (!cleaned.fuelFilterCode) delete cleaned.fuelFilterCode;
   if (!cleaned.cabinFilterCode) delete cleaned.cabinFilterCode;
   if (!cleaned.vehicleBrand) delete cleaned.vehicleBrand;
   if (!cleaned.vehicleModel) delete cleaned.vehicleModel;
   if (!cleaned.vehicleYear) delete cleaned.vehicleYear;
+  if (!cleaned.type) delete cleaned.type;
   
   return cleaned;
 });
@@ -119,6 +122,102 @@ fs.writeFileSync(filtersJsonPath, JSON.stringify(cleanedFilters, null, 2), 'utf8
 
 console.log(`✅ Filters JSON actualizado: ${filtersJsonPath}`);
 console.log(`📊 Total de registros: ${filtersJsonData.length}`);
+
+// ============================================
+// IMPORTAR LUBRICANTS
+// ============================================
+let lubricantsFile = null;
+let hasLubricantsSheet = false;
+
+// Primero intentar en data.xlsx si existe
+if (fs.existsSync(excelPath)) {
+  const wbCheck = XLSX.readFile(excelPath);
+  const hasLubricants = wbCheck.SheetNames.some((name) => {
+    const nameLower = name.toLowerCase();
+    return name === 'Lubricants' || 
+           name === 'Lubricantes' || 
+           name === 'oil' ||
+           name === 'Oil' ||
+           nameLower.includes('lubricant') ||
+           nameLower.includes('oil');
+  });
+  if (hasLubricants) {
+    lubricantsFile = excelPath;
+    hasLubricantsSheet = true;
+  }
+}
+
+// Si no se encontró en data.xlsx, intentar archivo individual
+if (!hasLubricantsSheet && fs.existsSync(lubricantsFallback)) {
+  lubricantsFile = lubricantsFallback;
+  console.log('⚠️  Usando archivo individual lubricants.xlsx');
+}
+
+if (lubricantsFile && fs.existsSync(lubricantsFile)) {
+  const wbLubricants = XLSX.readFile(lubricantsFile);
+  let lubricantsSheetName = 'Lubricants';
+  
+  // Buscar la hoja de lubricantes con diferentes nombres posibles
+  if (wbLubricants.SheetNames.includes('Lubricants')) {
+    lubricantsSheetName = 'Lubricants';
+  } else if (wbLubricants.SheetNames.includes('Lubricantes')) {
+    lubricantsSheetName = 'Lubricantes';
+  } else if (wbLubricants.SheetNames.includes('oil')) {
+    lubricantsSheetName = 'oil';
+  } else if (wbLubricants.SheetNames.includes('Oil')) {
+    lubricantsSheetName = 'Oil';
+  } else {
+    const foundSheet = wbLubricants.SheetNames.find((name) => {
+      const nameLower = name.toLowerCase();
+      return nameLower.includes('lubricant') || nameLower.includes('oil');
+    });
+    if (foundSheet) {
+      lubricantsSheetName = foundSheet;
+      console.log(`⚠️  Hoja "Lubricants" no encontrada, usando: ${lubricantsSheetName}`);
+    } else {
+      console.log(`⚠️  No se encontró hoja de lubricantes en ${lubricantsFile}, omitiendo...`);
+      lubricantsFile = null;
+    }
+  }
+
+  if (lubricantsFile) {
+    const lubricantsWs = wbLubricants.Sheets[lubricantsSheetName];
+    const lubricantsJsonData = XLSX.utils.sheet_to_json(lubricantsWs);
+
+    const cleanedLubricants = lubricantsJsonData.map((row) => {
+      const cleaned = {};
+      
+      // Convertir id a string (TypeScript espera string, no number)
+      const idValue = row.id || row.ID || '';
+      cleaned.id = String(idValue);
+      
+      cleaned.code = row.code || row.Code || row.Código || '';
+      cleaned.description = row.description || row.Description || row.Descripción || row.descirption || row.Descirption || '';
+      cleaned.graduation = row.graduation || row.Graduation || row.graduatio || row.Graduatio || row.Graduación || '';
+      cleaned.presentation = row.presentation || row.Presentation || row.Presentación || '';
+      cleaned.type = row.type || row.Type || row.Tipo || '';
+      cleaned.norm = row.norm || row.Norm || row.Norma || '';
+      cleaned.imageUrl = row.imageUrl || row['Image URL'] || row['URL de Imagen'] || row.imageurl || '';
+      
+      // Eliminar campos vacíos opcionales para mantener el JSON limpio
+      if (!cleaned.graduation) delete cleaned.graduation;
+      if (!cleaned.presentation) delete cleaned.presentation;
+      if (!cleaned.type) delete cleaned.type;
+      if (!cleaned.norm) delete cleaned.norm;
+      if (!cleaned.imageUrl) delete cleaned.imageUrl;
+      
+      return cleaned;
+    });
+
+    const lubricantsJsonPath = path.join(__dirname, '../src/data/lubricants.json');
+    fs.writeFileSync(lubricantsJsonPath, JSON.stringify(cleanedLubricants, null, 2), 'utf8');
+
+    console.log(`✅ Lubricants JSON actualizado: ${lubricantsJsonPath}`);
+    console.log(`📊 Total de registros: ${lubricantsJsonData.length}`);
+  }
+} else {
+  console.log('⚠️  Archivo de lubricantes no encontrado, omitiendo...');
+}
 
 console.log('\n🎉 ¡Importación completa exitosa!');
 

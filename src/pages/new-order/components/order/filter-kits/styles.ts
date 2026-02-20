@@ -349,8 +349,8 @@ export const Styled = {
     gap: 2px;
     flex-shrink: 0;
     margin-right: 0;
-    background-color:rgb(255, 255, 255);
-    border: 2px solid rgb(23, 23, 23);
+    background-color:rgb(85, 84, 84);
+    border-right: 2px solid white;
     border-radius: 12px 0 0 12px;
     padding: 4px 8px;
     height: 100%;
@@ -394,4 +394,106 @@ export const Styled = {
     }
   `,
 };
+
+// Estilos para el NumberInput
+export const blue = {
+  100: '#daecff',
+  200: '#b6daff',
+  300: '#66b2ff',
+  400: '#3399ff',
+  500: '#007fff',
+  600: '#0072e5',
+  700: '#0059B2',
+  800: '#004c99',
+};
+
+export const grey = {
+  50: '#F3F6F9',
+  100: '#E5EAF2',
+  200: '#DAE2ED',
+  300: '#C7D0DD',
+  400: '#B0B8C4',
+  500: '#9DA8B7',
+  600: '#6B7A90',
+  700: '#434D5B',
+  800: '#303740',
+  900: '#1C2025',
+};
+
+export const StyledInputRoot = styled('div')`
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 400;
+  color: ${grey[500]};
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const StyledInput = styled('input')`
+  font-size: 0.875rem;
+  font-family: inherit;
+  font-weight: 400;
+  line-height: 1.375;
+  color: rgb(255, 255, 255);
+  background: rgba(255, 255, 255, 0);
+  border-bottom: 0px solid #e0e0e0;
+  box-shadow: none;
+  border-radius: 0px;
+  margin: 0 2px;
+  padding: 6px 8px;
+  outline: 0;
+  min-width: 0;
+  width: 3rem;
+  text-align: center;
+
+  &:hover {
+    border-color: ${blue[400]};
+  }
+
+  &:focus {
+    border-color: ${blue[400]};
+    box-shadow: 0 0 0 3px ${blue[200]};
+  }
+
+  &:focus-visible {
+    outline: 0;
+  }
+`;
+
+export const StyledButton = styled('button')`
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 0.875rem;
+  box-sizing: border-box;
+  line-height: 1.5;
+  border: 0px solid;
+  border-radius: 999px;
+  border-color: #e0e0e0;
+  background: rgba(255, 255, 255, 0);
+  color: rgb(255, 255, 255);
+  width: 25px;
+  height: 25px;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  transition-property: all;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 120ms;
+
+  &:hover {
+    cursor: pointer;
+    background: #fff5e6;
+    border-color: #FF8C00;
+    color: #FF8C00;
+  }
+
+  &:focus-visible {
+    outline: 0;
+  }
+
+  &.increment {
+    order: 1;
+  }
+`;
 

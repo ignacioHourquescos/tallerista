@@ -3,15 +3,18 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 interface FilterContextType {
   brandFilter: string;
   setBrandFilter: (brand: string) => void;
+  graduationFilter: string;
+  setGraduationFilter: (graduation: string) => void;
 }
 
 const FilterContext = createContext<FilterContextType | undefined>(undefined);
 
 export const FilterProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [brandFilter, setBrandFilter] = useState<string>('');
+  const [graduationFilter, setGraduationFilter] = useState<string>('');
 
   return (
-    <FilterContext.Provider value={{ brandFilter, setBrandFilter }}>
+    <FilterContext.Provider value={{ brandFilter, setBrandFilter, graduationFilter, setGraduationFilter }}>
       {children}
     </FilterContext.Provider>
   );
