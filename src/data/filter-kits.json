@@ -48,5 +48,16 @@
     "fuelFilterCode": "G7729",
     "cabinFilterCode": "HK214",
     "vehicleBrand": "Fiat"
+  },
+  {
+    "id": "5",
+    "vehicleName": "Gol Trend",
+    "description": "Saveiro",
+    "imageUrl": "https://vw-digital-cdn-global.itd.vw.com.br/assets/vw-newsroon-cdn-ar-ps/notas/VW%20Gol%20(3).jpg",
+    "oilFilterCode": "PH5548A",
+    "airFilterCode": "CA9410",
+    "fuelFilterCode": "G10230",
+    "cabinFilterCode": "HK508",
+    "vehicleBrand": "Volkswagen"
   }
 ]

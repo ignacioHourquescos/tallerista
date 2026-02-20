@@ -76,5 +76,29 @@
     "imageUrl": "https://catalogofram.com.ar/img?url=https%3A%2F%2Fproduction-specparts-search-api-images-bucket.s3.amazonaws.com%2Fpart_pictures%2FU8AMrhqlgiWkp3zCk7exfo5uMQOMaTq3.jpg",
     "description": "Filtro de cabina",
     "type": "cabin"
+  },
+  {
+    "code": "PH5548",
+    "imageUrl": "https://http2.mlstatic.com/D_NQ_NP_2X_955959-MLA51260303860_082022-F.webp",
+    "description": "Filtro de aceite",
+    "type": "oil"
+  },
+  {
+    "code": "CA9410",
+    "imageUrl": "https://http2.mlstatic.com/D_NQ_NP_2X_779506-MLA92397976027_092025-F.webp",
+    "description": "Filtro de aire",
+    "type": "air"
+  },
+  {
+    "code": "G10230",
+    "imageUrl": "https://acdn-us.mitiendanube.com/stores/005/955/023/products/d_921551-mla71695414979_092023-o-16894ece77d5b4437817448881291745-1024-1024.webp",
+    "description": "Filtro de combustible",
+    "type": "fuel"
+  },
+  {
+    "code": "HK508",
+    "imageUrl": "https://www.dhfdistribuidora.com.ar/content/bucket/0/1630w430h270.jpg.webp",
+    "description": "Filtro de cabina",
+    "type": "cabin"
   }
 ]
