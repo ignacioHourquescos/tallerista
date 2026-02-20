@@ -36,14 +36,13 @@ export const Styled = {
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    transition: box-shadow 0.15s ease;
     display: flex;
     flex-direction: column;
     width: 100%;
     box-sizing: border-box;
 
     &:hover {
-      transform: translateY(-1px);
       box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12);
     }
 
@@ -147,6 +146,24 @@ export const Styled = {
       color: #1976d2;
     }
   `,
+  CarouselFilterIcon: styled.div<{ $active: boolean }>`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background-color: ${props => props.$active ? 'rgba(25, 118, 210, 0.1)' : 'transparent'};
+    color: ${props => props.$active ? '#1976d2' : '#666'};
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid ${props => props.$active ? '#1976d2' : 'transparent'};
+    
+    &:hover {
+      background-color: rgba(25, 118, 210, 0.15);
+      color: #1976d2;
+    }
+  `,
   CarouselCheckboxWrapper: styled.div<{ $active: boolean }>`
     display: flex;
     flex-direction: column;
@@ -215,44 +232,70 @@ export const Styled = {
       letter-spacing: 0.3px;
     }
   `,
+  BottomSection: styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background-color:rgb(255, 255, 255);
+    border-radius: 8px;
+    padding: 0;
+    gap: 12px;
+    margin-top: 0px;
+    margin-bottom: 6px;
+  `,
   PriceSection: styled.div`
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
     width: 100%;
     flex-shrink: 0;
-    margin-bottom: 8px;
+    padding: 0;
   `,
   PriceContainer: styled.div`
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-start;
     gap: 8px;
     width: 100%;
+    justify-content: space-between;
   `,
-  KitPriceRow: styled.div`
+  KitPriceColumn: styled.div<{ $selected?: boolean }>`
     display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
+    flex-direction: column;
     align-items: center;
-    width: 100%;
-    gap: 8px;
+    justify-content: center;
+    flex: 1;
+    gap: 2px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    border: 2px solid ${props => props.$selected ? '#FF8C00' : '#e0e0e0'};
+    border-radius: 8px;
+    background-color: ${props => props.$selected ? '#f5f5f5' : '#ffffff'};
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    
+    &:hover {
+      border-color: ${props => props.$selected ? '#1a1a1a' : '#999'};
+      background-color: ${props => props.$selected ? '#f5f5f5' : '#fafafa'};
+    }
   `,
-  KitPriceLabel: styled.span`
-    font-size: 0.9em;
-    font-weight: 500;
-    color: #666;
+  KitPriceLabel: styled.span<{ $selected?: boolean }>`
+    font-size: 0.85em;
+    font-weight: ${props => props.$selected ? '600' : '500'};
+    color: ${props => props.$selected ? '#1a1a1a' : '#666'};
     flex-shrink: 0;
-    text-align: left;
+    text-align: center;
   `,
   KitPriceValue: styled.span`
-    font-size: 1em;
+    font-size: 0.9em;
     font-weight: 600;
     color: #1a1a1a;
+    text-align: center;
     display: flex;
     align-items: center;
-    gap: 4px;
-    margin-left: auto;
+    justify-content: center;
+    gap: 2px;
   `,
   TotalPrice: styled.span`
     font-size: 1.2em;
@@ -279,28 +322,18 @@ export const Styled = {
   QuantityAndButtonContainer: styled.div`
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-top: 8px;
-    margin-left: -10px;
-    margin-right: -10px;
-    padding: 12px 14px;
-    background-color: transparent;
-    border-radius: 0;
-    width: calc(100% + 20px);
+    gap: 0;
+    width: 100%;
     box-sizing: border-box;
-
-    @media (max-width: 768px) {
-      margin-left: 0;
-      margin-right: 0;
-      width: 100%;
-      padding: 12px;
-    }
+    padding: 0;
   `,
   FirstRow: styled.div`
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: stretch;
     width: 100%;
+    gap: 0;
+    min-height: 48px;
   `,
   DiscountMessage: styled.div`
     font-size: 0.9em;
@@ -315,7 +348,13 @@ export const Styled = {
     justify-content: flex-start;
     gap: 2px;
     flex-shrink: 0;
-    margin-right: 12px;
+    margin-right: 0;
+    background-color:rgb(255, 255, 255);
+    border: 2px solid rgb(23, 23, 23);
+    border-radius: 12px 0 0 12px;
+    padding: 4px 8px;
+    height: 100%;
+    width: 50%;
   `,
   QuantityInput: styled.div`
     display: flex;
@@ -333,18 +372,19 @@ export const Styled = {
     gap: 4px;
     flex: 1;
     padding: 12px 18px;
-    background-color: #1a1a1a;
+    background-color:rgb(0, 0, 0);
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 0 12px 12px 0;
     font-size: 1em;
     font-weight: 500;
+    height: 100%;
     cursor: pointer;
     transition: background-color 0.2s;
     line-height: 1.4;
 
     &:hover:not(:disabled) {
-      background-color: #000000;
+      background-color: #5a5a5a;
     }
 
     &:disabled {

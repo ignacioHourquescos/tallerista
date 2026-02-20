@@ -183,6 +183,7 @@ const MainContent = styled.main<MainContentProps>`
   overflow-y: auto;
   font-size: ${(p) => (p.$panelOpen ? '0.85em' : '1em')};
   transition: font-size 0.3s ease-in-out;
+  background-color: #fafafa;
 `;
 
 /* ── component ── */

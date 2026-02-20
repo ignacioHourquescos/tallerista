@@ -1,10 +1,13 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Radio } from '@mui/material';
 import { Unstable_NumberInput as BaseNumberInput } from '@mui/base/Unstable_NumberInput';
 import { styled } from '@mui/system';
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+import OilBarrelIcon from '@mui/icons-material/OilBarrel';
+import AirIcon from '@mui/icons-material/Air';
+import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import { Styled } from './styles';
 import { enrichAllFilterKitsWithPrices } from '@/application/services/filter-kits';
 import { FilterKitWithPrices } from '@/application/models/filter-kits';
@@ -74,7 +77,7 @@ const FilterKitsList: React.FC<IFilterKitsList> = ({
         initialCabin[kit.id] = false; // Cabina NO marcado por defecto
         initialQuantities[kit.id] = 1;
         initialImageIndex[kit.id] = 0; // Siempre empezar con la imagen del vehículo (índice 0)
-        initialSelectedKitType[kit.id] = 'basic'; // Kit básico seleccionado por defecto
+        initialSelectedKitType[kit.id] = 'complete'; // Kit completo seleccionado por defecto
       });
       setIncludeOilFilterByKit(initialOil);
       setIncludeAirFilterByKit(initialAir);
@@ -130,7 +133,7 @@ const FilterKitsList: React.FC<IFilterKitsList> = ({
   };
 
   const handleAddKitToCart = (kit: FilterKitWithPrices) => {
-    const kitType = selectedKitType[kit.id] || 'basic';
+    const kitType = selectedKitType[kit.id] || 'complete';
     const quantity = kitQuantities[kit.id] || 1;
 
     // Determinar el nombre del tipo de kit
@@ -292,29 +295,30 @@ const FilterKitsList: React.FC<IFilterKitsList> = ({
                       if (idx === 0) return null;
                       
                       const isActive = idx === currentIdx;
-                      let label = '';
+                      let IconComponent = null;
                       if (image.type === 'oil') {
-                        label = 'Aceite';
+                        IconComponent = OilBarrelIcon;
                       } else if (image.type === 'air') {
-                        label = 'Aire';
+                        IconComponent = AirIcon;
                       } else if (image.type === 'fuel') {
-                        label = 'COMB';
+                        IconComponent = LocalGasStationIcon;
                       } else if (image.type === 'cabin') {
-                        label = 'Cabina';
+                        IconComponent = FilterAltIcon;
                       }
                       
+                      if (!IconComponent) return null;
+                      
                       return (
-                        <Styled.CarouselCheckboxWrapper key={idx} $active={isActive}>
-                          <Styled.CarouselCheckboxContainer
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setCurrentImageIndex(prev => ({ ...prev, [kit.id]: idx }));
-                            }}
-                            style={{ cursor: 'pointer' }}
-                          >
-                            <Styled.CarouselCheckboxLabel>{label}</Styled.CarouselCheckboxLabel>
-                          </Styled.CarouselCheckboxContainer>
-                        </Styled.CarouselCheckboxWrapper>
+                        <Styled.CarouselFilterIcon
+                          key={idx}
+                          $active={isActive}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentImageIndex(prev => ({ ...prev, [kit.id]: idx }));
+                          }}
+                        >
+                          <IconComponent fontSize="small" />
+                        </Styled.CarouselFilterIcon>
                       );
                     })}
                   </Styled.CarouselCheckboxes>
@@ -333,6 +337,8 @@ const FilterKitsList: React.FC<IFilterKitsList> = ({
                 </Styled.CarouselControls>
               )}
             <Styled.KitContent>
+              {/* Sección inferior: Precios y acciones */}
+              <Styled.BottomSection>
               {/* Primera fila: Precios de los 3 kits */}
               <Styled.PriceSection>
                 {(() => {
@@ -376,60 +382,51 @@ const FilterKitsList: React.FC<IFilterKitsList> = ({
                       : kit.cabinFilter.priceWithoutVAT;
                   }
 
-                  const currentSelectedType = selectedKitType[kit.id] || 'basic';
+                  const currentSelectedType = selectedKitType[kit.id] || 'complete';
 
                   return (
                     <Styled.PriceContainer>
                       {/* Kit Básico */}
-                      <Styled.KitPriceRow>
-                        <Radio
-                          checked={currentSelectedType === 'basic'}
-                          onChange={() => setSelectedKitType(prev => ({ ...prev, [kit.id]: 'basic' }))}
-                          size="small"
-                          sx={{ padding: '4px' }}
-                        />
-                        <Styled.KitPriceLabel>Kit Básico:</Styled.KitPriceLabel>
+                      <Styled.KitPriceColumn
+                        $selected={currentSelectedType === 'basic'}
+                        onClick={() => setSelectedKitType(prev => ({ ...prev, [kit.id]: 'basic' }))}
+                      >
+                        <Styled.KitPriceLabel $selected={currentSelectedType === 'basic'}>Básico</Styled.KitPriceLabel>
                         <Styled.KitPriceValue>
                           {formatPrice(basicKitPrice)}
                           {!showIVA && (
                             <sup style={{ fontSize: '0.7em', marginLeft: 2 }}>+ IVA</sup>
                           )}
                         </Styled.KitPriceValue>
-                      </Styled.KitPriceRow>
+                      </Styled.KitPriceColumn>
 
                       {/* Kit Completo */}
-                      <Styled.KitPriceRow>
-                        <Radio
-                          checked={currentSelectedType === 'complete'}
-                          onChange={() => setSelectedKitType(prev => ({ ...prev, [kit.id]: 'complete' }))}
-                          size="small"
-                          sx={{ padding: '4px' }}
-                        />
-                        <Styled.KitPriceLabel>Kit Completo:</Styled.KitPriceLabel>
+                      <Styled.KitPriceColumn
+                        $selected={currentSelectedType === 'complete'}
+                        onClick={() => setSelectedKitType(prev => ({ ...prev, [kit.id]: 'complete' }))}
+                      >
+                        <Styled.KitPriceLabel $selected={currentSelectedType === 'complete'}>Completo</Styled.KitPriceLabel>
                         <Styled.KitPriceValue>
                           {formatPrice(completeKitPrice)}
                           {!showIVA && (
                             <sup style={{ fontSize: '0.7em', marginLeft: 2 }}>+ IVA</sup>
                           )}
                         </Styled.KitPriceValue>
-                      </Styled.KitPriceRow>
+                      </Styled.KitPriceColumn>
 
                       {/* Kit Full */}
-                      <Styled.KitPriceRow>
-                        <Radio
-                          checked={currentSelectedType === 'full'}
-                          onChange={() => setSelectedKitType(prev => ({ ...prev, [kit.id]: 'full' }))}
-                          size="small"
-                          sx={{ padding: '4px' }}
-                        />
-                        <Styled.KitPriceLabel>Kit Full:</Styled.KitPriceLabel>
+                      <Styled.KitPriceColumn
+                        $selected={currentSelectedType === 'full'}
+                        onClick={() => setSelectedKitType(prev => ({ ...prev, [kit.id]: 'full' }))}
+                      >
+                        <Styled.KitPriceLabel $selected={currentSelectedType === 'full'}>Full</Styled.KitPriceLabel>
                         <Styled.KitPriceValue>
                           {formatPrice(fullKitPrice)}
                           {!showIVA && (
                             <sup style={{ fontSize: '0.7em', marginLeft: 2 }}>+ IVA</sup>
                           )}
                         </Styled.KitPriceValue>
-                      </Styled.KitPriceRow>
+                      </Styled.KitPriceColumn>
                     </Styled.PriceContainer>
                   );
                 })()}
@@ -438,7 +435,7 @@ const FilterKitsList: React.FC<IFilterKitsList> = ({
               {/* Segunda fila: Contador y botón de agregar */}
               <Styled.QuantityAndButtonContainer>
                 {(() => {
-                  const kitType = selectedKitType[kit.id] || 'basic';
+                  const kitType = selectedKitType[kit.id] || 'complete';
                   
                   // Determinar qué filtros incluir según el tipo de kit seleccionado
                   let includeOil = false;
@@ -513,6 +510,7 @@ const FilterKitsList: React.FC<IFilterKitsList> = ({
                   );
                 })()}
               </Styled.QuantityAndButtonContainer>
+              </Styled.BottomSection>
             </Styled.KitContent>
           </Styled.KitCard>
           );
@@ -564,10 +562,10 @@ const StyledInput = styled('input')`
   font-family: inherit;
   font-weight: 400;
   line-height: 1.375;
-  color: ${grey[900]};
-  background: #fff;
-  border: 1px solid ${grey[200]};
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.05);
+  color: #1a1a1a;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  box-shadow: none;
   border-radius: 8px;
   margin: 0 2px;
   padding: 6px 8px;
@@ -597,9 +595,9 @@ const StyledButton = styled('button')`
   line-height: 1.5;
   border: 1px solid;
   border-radius: 999px;
-  border-color: ${grey[200]};
-  background: ${grey[50]};
-  color: ${grey[900]};
+  border-color: #e0e0e0;
+  background:rgb(255, 255, 255);
+  color:rgb(14, 14, 14);
   width: 25px;
   height: 25px;
   display: flex;
@@ -612,9 +610,9 @@ const StyledButton = styled('button')`
 
   &:hover {
     cursor: pointer;
-    background: ${blue[500]};
-    border-color: ${blue[400]};
-    color: ${grey[50]};
+    background: #fff5e6;
+    border-color: #FF8C00;
+    color: #FF8C00;
   }
 
   &:focus-visible {
